@@ -1,22 +1,32 @@
 #include <cstdio>
 using namespace std;
 
-int n, cnt[26], ans;
-char a[1010];
+int n, x, sum, mx;
+
+inline int max(int a, int b)
+{
+	return a > b ? a : b;
+}
+inline int min(int a, int b)
+{
+	return a < b ? a : b;
+}
 
 int main()
 {
 	scanf("%d", &n);
-	scanf("%s", a);
-	for (int i = 0; i < n; i++) ++cnt[a[i] - 'a'];
-	for (int i = 0; i < 26; i++)
+	if (n < 3) return puts("-1"), 0;
+	for (int i = 1; i <= n; i++)
 	{
-		while (cnt[i])
+		scanf("%d", &x);
+		sum += x;
+		mx = max(mx, x);
+		if (mx * 2 < sum)
 		{
-			++ans;
-			for (int j = i; j < 26 && cnt[j]; j++) --cnt[j];
+			printf("%d\n", i);
+			return 0;
 		}
 	}
-	printf("%d\n", ans);
+	puts("-1");
 	return 0;
 }

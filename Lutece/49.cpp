@@ -1,32 +1,42 @@
 #include <cstdio>
+#include <cstring>
+#include <iostream>
 using namespace std;
 
-int n, x, sum, mx;
-
-inline int max(int a, int b)
-{
-	return a > b ? a : b;
-}
-inline int min(int a, int b)
-{
-	return a < b ? a : b;
-}
+char a[110], m;
+int cnt[6], lx, n, k, r;
 
 int main()
 {
-	scanf("%d", &n);
-	if (n < 3) return puts("-1"), 0;
-	for (int i = 1; i <= n; i++)
+	scanf("%d %d", &n, &k);
+	for (int i = 1; i <= min(k, n) && !r; i++)
 	{
-		scanf("%d", &x);
-		sum += x;
-		mx = max(mx, x);
-		if (mx * 2 < sum)
+		cnt['F' - 'A']++;
+		if (cnt['F' - 'A'] == 50)
 		{
-			printf("%d\n", i);
-			return 0;
+			r = i;
+			m = 'F';
+			break;
+		}
+		scanf("%s", &a);
+		lx = strlen(a);
+		for (int j = 0; j < lx; j++)
+		{
+			++cnt[a[j] - 'A'];
+			if (cnt[a[j] - 'A'] == 50)
+			{
+				r = i;
+				m = a[j];
+				break;
+			}
 		}
 	}
-	puts("-1");
+	if (r)
+		printf("%d %c\n", r, m);
+	else
+	{
+		if (k <= n) puts("Feizhou Yin");
+		else puts("AMNZ");
+	}
 	return 0;
 }
