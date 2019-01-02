@@ -9,7 +9,7 @@ using namespace std;
 int n, m, mn, u, v, cnt, pt, f[200010], fx, fy;
 long long w, sum, a[200010];
 
-pair <long long, pair<int, int> > p[300010];
+pair <long long, pair<int, int> > p[400010];
 
 inline int getf(int x)
 {
