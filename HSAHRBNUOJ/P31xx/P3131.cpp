@@ -1,6 +1,6 @@
 #include <cstdio>
 #include <cstring>
-#define MAXN 100
+#define MAXN 105
 using namespace std;
 
 int dp[MAXN], c[11], n;

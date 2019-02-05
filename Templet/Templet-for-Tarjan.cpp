@@ -47,7 +47,7 @@ inline void Tarjan(int x, int father)
 		if (dfn[e[i].to]) low[x] = mymin(low[x], dfn[e[i].to]);
 		else
 		{
-			Tarjan(e[i].to, father);
+			Tarjan(e[i].to, x);
 			low[x] = mymin(low[x], low[e[i].to]);
 			c++;
 			if (x != 1 && dfn[x] <= low[e[i].to]) cut_vertex[x] = true;
