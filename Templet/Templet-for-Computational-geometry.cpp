@@ -94,7 +94,6 @@ int n;
 point p[MAXN], ch[MAXN];
 //Please start at 0 when you input.(It can be convenient for figure the size)
 
-
 int ConvexHull(point *p, int n)
 {
 	sort(p, p + n);
@@ -129,10 +128,7 @@ double Polygon_Area(point *p, int n) //Figure out the size of the Polygen
 	return s;
 }
 
-
-
 double Rotating_Calipers()//Get the longest distance among points
-
 {
 	double res = 0.0;
 	int q = 1;
@@ -143,8 +139,6 @@ double Rotating_Calipers()//Get the longest distance among points
 	}
 	return res;
 }
-
-
 
 int main()
 
