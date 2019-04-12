@@ -29,6 +29,26 @@ inline void GetNext(char S[])
 	return ;
 }
 
+//S: Main string, T: Pattern string.
+inline int KMP(char S[], char T[])
+{
+	int ans = 0;
+	int i = 0, j = 0;
+	while (i < lb && j < la)
+	{
+		if (!~j || S[i] == T[j])
+		{
+			++i; ++j;
+			if (j == la)
+			{
+				++ans; j = nxt[j - 1]; --i;
+			}
+		}
+		else j = nxt[j];
+	}
+	return ans;
+}
+
 inline void GetExtendNext(char S[])
 {
 	int a = 0, Slen = strlen(S);
