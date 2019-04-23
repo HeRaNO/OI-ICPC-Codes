@@ -1,4 +1,4 @@
-# OI / ICPC Codes ![avatar](https://herano.github.io/images/avatar.png)
+# OI / ICPC Codes ![avatar](https://www.gravatar.com/avatar/db46c601e36b86f9f275e9349e798149?s=100&d=mm&r=g)
 
 Some solutions to OI / ICPC problems. They're from:
 
