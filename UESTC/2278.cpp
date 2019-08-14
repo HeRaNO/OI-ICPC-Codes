@@ -36,7 +36,6 @@ int main()
 	scanf("%d",&n);
 	if (!n) return puts("1"),0;
 	Linear_Shaker();
-	for (int i=1;i<=n;i++) printf("%d ",mu[i]);puts("");
 	for (int i=1;i<=n;i++)
 	{
 		long long p=n/i;
