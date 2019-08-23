@@ -24,7 +24,9 @@ int main()
 			printf("%d ",q[i]);
 		}
 	}
+	bool f=true;
 	for(int i=1;i<=n;i++)
-		if(num[a[i]])printf("%d ",a[i]);
+		if(num[a[i]])
+			printf("%d ",a[i]);
 	return 0;
 }
