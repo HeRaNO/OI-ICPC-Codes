@@ -1,8 +1,8 @@
 #include <queue>
 #include <cstdio>
 #include <cstring>
-#define MAXN 100010
-#define MAXM 500010
+#define MAXN 100005
+#define MAXM 500005
 using namespace std;
 
 struct link
@@ -12,12 +12,22 @@ struct link
 	int nxt;
 };
 
+struct node
+{
+	long long d;
+	int u;
+	bool operator < (const node &a)const
+	{
+		return d > a.d;
+	}
+};
+
 link e[MAXM << 1];
 int head[MAXN], cnt;
 int n, k, m, delta, S, T, x, y, z;
 long long dis[MAXN];
 bool vis[MAXN];
-queue <int> q;
+priority_queue <node> q;
 
 inline void add(int u, int v, long long w)
 {
@@ -33,27 +43,23 @@ inline void add(int u, int v, long long w)
 	head[v] = cnt++;
 }
 
-inline void SPFA(int S)
+inline void Dijkstra(int S)
 {
+	memset(dis, 0x3f, sizeof dis);
 	memset(vis, false, sizeof vis);
-	for (int i = 1; i <= n; i++) dis[i] = 1e16;
-	q.push(S);
-	vis[S] = true;
+	q.push((node){0, S});
 	dis[S] = 0;
 	while (!q.empty())
 	{
-		int u = q.front();
+		node x = q.top();
 		q.pop();
-		vis[u] = false;
-		for (int i = head[u]; ~i; i = e[i].nxt)
-			if (dis[e[i].to] > dis[u] + e[i].val)
+		if (vis[x.u]) continue;
+		vis[x.u] = true;
+		for (int i = head[x.u]; ~i; i = e[i].nxt)
+			if (dis[e[i].to] > dis[x.u] + e[i].val)
 			{
-				dis[e[i].to] = dis[u] + e[i].val;
-				if (!vis[e[i].to])
-				{
-					vis[e[i].to] = true;
-					q.push(e[i].to);
-				}
+				dis[e[i].to] = dis[x.u] + e[i].val;
+				q.push((node){dis[e[i].to], e[i].to});
 			}
 	}
 	return ;
@@ -101,7 +107,7 @@ int main()
 				add(x, y, z);
 			}
 		}
-		SPFA(S);
+		Dijkstra(S);
 		bool f = true;
 		if (S <= k)
 		{
@@ -123,7 +129,7 @@ int main()
 				if (dis[i] < mn) mn = dis[i], pt = i;
 			for (int i = 1; i <= k; i++)
 				if (pt != i) add(pt, i, delta);
-			SPFA(S);
+			Dijkstra(S);
 			for (int i = 1; i <= n; i++)
 			{
 				if (f)
