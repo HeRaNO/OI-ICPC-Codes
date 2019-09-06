@@ -240,7 +240,7 @@ inline long long C(int m, int n, long long MOD)
 
 /*
     By using Lucas_C(n,m,MOD),you can figure out C(m,n)%MOD as well.
-    When n,m is huge but MOD is small than 1e8,Lucas_C is recommended.
+    When n,m is huge but MOD is smaller than 1e8,Lucas_C is recommended.
 */
 long long Lucas_C(long long m, long long n, long long MOD)
 {
