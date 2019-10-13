@@ -76,8 +76,7 @@ inline double solve()
 
 int main()
 {
-	int T;scanf("%d",&T);
-	while (T--)
+	while (true)
 	{
 		for (int i=1;i<=4;i++)
 		{
