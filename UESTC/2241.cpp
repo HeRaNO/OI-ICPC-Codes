@@ -76,15 +76,15 @@ void DC3 (int *r, int *sa, int n, int m)
 
 void calHeight(int *r,int *sa,int n,int *height)
 {
-    int i,j,k=0;
-    for(int i=1;i<=n;i++) Rank[sa[i]]=i;
-    for(int i=0;i<n;i++)
-    {
-        if(k) k--;
-        j=sa[Rank[i]-1];
-        while(i+k<n&&j+k<n&&r[i+k]==r[j+k]) k++;
-        height[Rank[i]]=k;
-    }
+	int i,j,k=0;
+	for(int i=1;i<=n;i++) Rank[sa[i]]=i;
+	for(int i=0;i<n;i++)
+	{
+		if(k) k--;
+		j=sa[Rank[i]-1];
+		while(i+k<n&&j+k<n&&r[i+k]==r[j+k]) k++;
+		height[Rank[i]]=k;
+	}
 }
 
 int main()

@@ -237,8 +237,8 @@ int main()
 	{
 		read(o);read(l);read(r);if (o<=3) read(x);
 		if (o==1) add(1,l,r+1,x);
-		else if (o==2) changemax(1,l,r+1,x);
-		else if (o==3) changemin(1,l,r+1,x);
+		else if (o==2) changemax(1,l,r+1,x); // ai -> max(ai,x)
+		else if (o==3) changemin(1,l,r+1,x); // ai -> min(ai,x)
 		else if (o==4) printf("%lld\n",query(1,l,r+1));
 		else if (o==5) printf("%d\n",qmax(1,l,r+1));
 		else printf("%d\n",qmin(1,l,r+1));
