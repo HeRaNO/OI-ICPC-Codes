@@ -16,11 +16,6 @@ int dpt[MAXN];
 int S, T, ans;
 queue <int> q;
 
-inline int mymin(int a, int b)
-{
-	return a < b ? a : b;
-}
-
 inline void add(int u, int v, int f) //add edge u->v
 {
 	e[++cnt] = (link)
@@ -61,7 +56,7 @@ inline int Dinic(int x, int flow)
 	for (int i = head[x]; ~i && left; i = e[i].nxt)
 		if (e[i].flow && dpt[e[i].to] == dpt[x] + 1)
 		{
-			int t = Dinic(e[i].to, mymin(left, e[i].flow));
+			int t = Dinic(e[i].to, min(left, e[i].flow));
 			e[i].flow -= t;
 			e[i ^ 1].flow += t;
 			left -= t;
