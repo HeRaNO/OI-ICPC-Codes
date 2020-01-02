@@ -3,7 +3,6 @@ using namespace std;
 
 const long long mod=2009731336725594113LL;
 const long long _2019=2019;
-const int lim[]={4,4,8,8,8};
 const int _3[]={3,3,0,1,0};
 const int _4[]={5,3,3,0,1};
 const long long u[]={
@@ -16,40 +15,18 @@ const long long u[]={
 
 struct SegmentTree
 {
-	int p,r,m,cnt,lazy[2],x[32];
+	int p,r,m,lazy[2],x[32];
 };
 
 SegmentTree tree[1<<21];
-int cnt[5],n,T,l,r,las;
-long long p[5][8];
-long long ap[8192];
+int n,T,l,r,las,t[32],tp;
+long long __3[4],__4[8];
 
 inline long long fmul(long long a,long long b)
 {
 	long long r=0;
 	for (;b;b>>=1,(a<<=1)%=mod) if (b&1) (r+=a)%=mod;
 	return r;
-}
-
-void dfs(int x,int f)
-{
-	if (x==5)
-	{
-		long long ans=1;
-		for (int i=0;i<=4;i++) ans=fmul(ans,p[i][cnt[i]]);
-		for (int i=0;i<=4;i++) printf("%d ",cnt[i]);
-		ap[f]=ans;printf("%lld\n",ans);
-		return ;
-	}
-	for (int i=0;i<lim[x];i++) cnt[x]=i,dfs(x+1,f<<(x<=1?2:3)|i);
-	return ;
-}
-
-int test(int a,int b,int c,int d,int e)
-{
-	int x=a;(x<<=2)|=b;
-	(x<<=3)|=c;(x<<=3)|=d;(x<<=3)|=e;
-	return x;
 }
 
 void BuildTree(int u)
@@ -60,7 +37,7 @@ void BuildTree(int u)
 		for (int i=0;i<32;i++)
 		{
 			int x=i>>3,y=i&7;
-			tree[u].x[i]=fmul(fmul(p[3][x],p[4][y]),a)%_2019;
+			tree[u].x[i]=fmul(fmul(__3[x],__4[y]),a)%_2019;
 		}
 		return ;
 	}
@@ -74,9 +51,10 @@ void BuildTree(int u)
 
 inline void add3(int u,int v)
 {
-	int x=tree[u].cnt>>3,y=tree[u].cnt&7;x+=v;
-	if (x&4) y+=4,x&=3;
-	y&=7;tree[u].cnt=x<<3|y;
+	for (int i=0,p=0;i<4;i++)
+		for (int j=0;j<8;j++)
+			t[p++]=tree[u].x[(((i+v)&3)<<3)|(j+((i+v)&4))&7];
+	for (int i=0;i<32;i++) tree[u].x[i]=t[i];
 	tree[u].lazy[0]+=v;
 	if (tree[u].lazy[0]&4) tree[u].lazy[1]+=4,tree[u].lazy[0]&=3;
 	tree[u].lazy[1]&=7;
@@ -85,8 +63,10 @@ inline void add3(int u,int v)
 
 inline void add4(int u,int v)
 {
-	int x=tree[u].cnt>>3,y=tree[u].cnt&7;(y+=v)&=7;
-	tree[u].cnt=x<<3|y;
+	for (int i=0,p=0;i<4;i++)
+		for (int j=0;j<8;j++)
+			t[p++]=tree[u].x[(i<<3)|((j+v)&7)];
+	for (int i=0;i<32;i++) tree[u].x[i]=t[i];
 	(tree[u].lazy[1]+=v)&=7;
 	return ;
 }
@@ -123,7 +103,7 @@ void modify3(int u,int l,int r,int v)
 		modify3(u<<1|1,tree[u].m,r,v);
 	}
 	for (int i=0;i<32;i++)
-		tree[u].x[i]=tree[u<<1].x[(i+tree[u<<1].cnt)&31]+tree[u<<1|1].x[(i+tree[u<<1|1].cnt)&31];
+		tree[u].x[i]=tree[u<<1].x[i]+tree[u<<1|1].x[i];
 	return ;
 }
 
@@ -142,13 +122,13 @@ void modify4(int u,int l,int r,int v)
 		modify4(u<<1|1,tree[u].m,r,v);
 	}
 	for (int i=0;i<32;i++)
-		tree[u].x[i]=tree[u<<1].x[(i+tree[u<<1].cnt)&31]+tree[u<<1|1].x[(i+tree[u<<1|1].cnt)&31];
+		tree[u].x[i]=tree[u<<1].x[i]+tree[u<<1|1].x[i];
 	return ;
 }
 
 inline int query(int u,int l,int r)
 {
-	if (tree[u].p==l&&tree[u].r==r) return tree[u].x[tree[u].cnt];
+	if (tree[u].p==l&&tree[u].r==r) return tree[u].x[0];
 	PushDown(u);
 	if (r<=tree[u].m) return query(u<<1,l,r);
 	else if (tree[u].m<=l) return query(u<<1|1,l,r);
@@ -165,17 +145,11 @@ inline void read(int &x)
 
 int main()
 {
-	for (int i=0;i<=4;i++)
-	{
-		p[i][0]=1;
-		for (int j=1;j<lim[i];j++) p[i][j]=fmul(p[i][j-1],u[i]);
-	}
+	__3[0]=__4[0]=1;
+	for (int i=1;i<4;i++) __3[i]=fmul(__3[i-1],u[3]);
+	for (int i=1;i<8;i++) __4[i]=fmul(__4[i-1],u[4]);
 	read(n);read(T);
 	tree[1].p=1;tree[1].r=n+1;BuildTree(1);
-	/*for (int i=0;i<=4;i++)
-		for (int j=0;j<lim[i];j++)
-			printf("%lld%c",p[i][j],j==lim[i]-1?'\n':' ');
-	dfs(0,0);*/
 	while (T--)
 	{
 		read(l);read(r);
