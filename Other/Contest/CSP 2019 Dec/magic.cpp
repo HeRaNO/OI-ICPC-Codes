@@ -1,16 +1,43 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const long long mod=2009731336725594113LL;
-const long long _2019=2019;
+const int _2019=2019;
 const int _3[]={3,3,0,1,0};
 const int _4[]={5,3,3,0,1};
-const long long u[]={
-	314882150829468584LL,
-	427197303358170108LL,
-	1022292690726729920LL,
-	1698479428772363217LL,
-	2006101093849356424LL
+const long long mod=2009731336725594113LL;
+const long long x[]={
+	1,
+	2006101093849356424,
+	941391648911191089,
+	1022292690726729920,
+	1810419142002041716,
+	1184285083219342236,
+	1267651882537955420,
+	1816515142381353759,
+	1698479428772363217,
+	1582534033367424005,
+	1302320796828332778,
+	1694849185896125529,
+	510564102676783292,
+	1256273799740659674,
+	508098345173708939,
+	1495536991172573131,
+	742079454187638693,
+	193216194344240354,
+	2009731336725594112,
+	3630242876237689,
+	1068339687814403024,
+	987438645998864193,
+	199312194723552397,
+	825446253506251877,
+	1501632991551885174,
+	514194345553020982,
+	311251907953230896,
+	427197303358170108,
+	707410539897261335,
+	314882150829468584,
+	1499167234048810821,
+	753457536984934439
 };
 
 struct SegmentTree
@@ -19,50 +46,44 @@ struct SegmentTree
 };
 
 SegmentTree tree[1<<21];
-int n,T,l,r,las,t[32],tp;
+int n,T,l,r,las,t[32],tp,p[2019][32];
 long long __3[4],__4[8];
 
-inline long long fmul(long long a,long long b)
+inline void add(long long &a,long long b)
 {
-	long long r=0;
-	for (;b;b>>=1,(a<<=1)%=mod) if (b&1) (r+=a)%=mod;
-	return r;
+	a+=b;if (a>mod) a-=mod;return ;
 }
 
 void BuildTree(int u)
 {
 	if (tree[u].p+1==tree[u].r)
 	{
-		long long a=tree[u].p;
-		for (int i=0;i<32;i++)
-		{
-			int x=i>>3,y=i&7;
-			tree[u].x[i]=fmul(fmul(__3[x],__4[y]),a)%_2019;
-		}
+		int a=tree[u].p%_2019;
+		for (int i=0;i<32;i++) tree[u].x[i]=p[a][i];
 		return ;
 	}
 	tree[u].m=tree[u].p+tree[u].r>>1;
 	tree[u<<1].p=tree[u].p;tree[u<<1].r=tree[u].m;BuildTree(u<<1);
 	tree[u<<1|1].p=tree[u].m;tree[u<<1|1].r=tree[u].r;BuildTree(u<<1|1);
-	for (int i=0;i<32;i++)
-		tree[u].x[i]=tree[u<<1].x[i]+tree[u<<1|1].x[i];
+	for (int i=0;i<32;i++) tree[u].x[i]=tree[u<<1].x[i]+tree[u<<1|1].x[i];
 	return ;
 }
 
 inline void add3(int u,int v)
 {
+	if (!v) return ;
 	for (int i=0,p=0;i<4;i++)
 		for (int j=0;j<8;j++)
 			t[p++]=tree[u].x[(((i+v)&3)<<3)|(j+((i+v)&4))&7];
 	for (int i=0;i<32;i++) tree[u].x[i]=t[i];
 	tree[u].lazy[0]+=v;
-	if (tree[u].lazy[0]&4) tree[u].lazy[1]+=4,tree[u].lazy[0]&=3;
-	tree[u].lazy[1]&=7;
+	if (tree[u].lazy[0]&4) (tree[u].lazy[1]+=4)&=7,tree[u].lazy[0]&=3;
 	return ;
 }
 
 inline void add4(int u,int v)
 {
+	if (!v) return ;
 	for (int i=0,p=0;i<4;i++)
 		for (int j=0;j<8;j++)
 			t[p++]=tree[u].x[(i<<3)|((j+v)&7)];
@@ -88,41 +109,21 @@ inline void PushDown(int u)
 	return ;
 }
 
-void modify3(int u,int l,int r,int v)
+void modify(int u,int l,int r,int v,int w)
 {
 	if (tree[u].p==l&&tree[u].r==r)
 	{
-		add3(u,v);return ;
+		add3(u,v);add4(u,w);return ;
 	}
 	PushDown(u);
-	if (r<=tree[u].m) modify3(u<<1,l,r,v);
-	else if (tree[u].m<=l) modify3(u<<1|1,l,r,v);
+	if (r<=tree[u].m) modify(u<<1,l,r,v,w);
+	else if (tree[u].m<=l) modify(u<<1|1,l,r,v,w);
 	else
 	{
-		modify3(u<<1,l,tree[u].m,v);
-		modify3(u<<1|1,tree[u].m,r,v);
+		modify(u<<1,l,tree[u].m,v,w);
+		modify(u<<1|1,tree[u].m,r,v,w);
 	}
-	for (int i=0;i<32;i++)
-		tree[u].x[i]=tree[u<<1].x[i]+tree[u<<1|1].x[i];
-	return ;
-}
-
-void modify4(int u,int l,int r,int v)
-{
-	if (tree[u].p==l&&tree[u].r==r)
-	{
-		add4(u,v);return ;
-	}
-	PushDown(u);
-	if (r<=tree[u].m) modify4(u<<1,l,r,v);
-	else if (tree[u].m<=l) modify4(u<<1|1,l,r,v);
-	else
-	{
-		modify4(u<<1,l,tree[u].m,v);
-		modify4(u<<1|1,tree[u].m,r,v);
-	}
-	for (int i=0;i<32;i++)
-		tree[u].x[i]=tree[u<<1].x[i]+tree[u<<1|1].x[i];
+	for (int i=0;i<32;i++) tree[u].x[i]=tree[u<<1].x[i]+tree[u<<1|1].x[i];
 	return ;
 }
 
@@ -145,17 +146,17 @@ inline void read(int &x)
 
 int main()
 {
-	__3[0]=__4[0]=1;
-	for (int i=1;i<4;i++) __3[i]=fmul(__3[i-1],u[3]);
-	for (int i=1;i<8;i++) __4[i]=fmul(__4[i-1],u[4]);
-	read(n);read(T);
-	tree[1].p=1;tree[1].r=n+1;BuildTree(1);
+	for (int i=0;i<32;i++)
+	{
+		long long now=x[i];
+		for (int j=1;j<2019;j++,add(now,x[i])) p[j][i]=now%_2019;
+	}
+	read(n);read(T);tree[1].p=1;tree[1].r=n+1;BuildTree(1);
 	while (T--)
 	{
 		read(l);read(r);
 		printf("%d\n",las=query(1,l,r+1));las%=5;
-		if (_3[las]) modify3(1,l,r+1,_3[las]);
-		if (_4[las]) modify4(1,l,r+1,_4[las]);
+		modify(1,l,r+1,_3[las],_4[las]);
 	}
 	return 0;
 }
