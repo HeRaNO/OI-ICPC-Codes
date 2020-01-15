@@ -17,7 +17,7 @@ inline bool judge(int x)
 int main()
 {
 	scanf("%d",&n);
-	for (int i=1;i<=n;i++,p=(p+1)%4)
+	for (int i=1;pp<n;i++,p=(p+1)%4)
 	{
 		if (judge(i))
 		{
