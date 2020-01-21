@@ -80,6 +80,51 @@ inline int GetDis(int u, int v)
 	return res;
 }
 
+namespace RMQLCA
+{
+	int n,u,v,rt,T,R,lg[MAXN<<1],pt[MAXN],dep[MAXN<<1];
+	int fa[18][MAXN<<1],euler[MAXN<<1],dis[MAXN];
+
+	inline void dfs(int x,int f,int deep,int v)
+	{
+		pt[x]=++R;euler[R]=x;dep[R]=deep;dis[x]=v;
+		for (int i=head[x];~i;i=e[i].nxt)
+			if (e[i].to!=f)
+			{
+				dfs(e[i].to,x,deep+1,e[i].val+v);
+				euler[++R]=x;dep[R]=deep;
+			}
+		return ;
+	}
+
+	inline void RMQLCA()
+	{
+		for (int i=1;i<=R;i++) fa[0][i]=i;
+		for (int i=2;i<=R;i++) lg[i]=lg[i>>1]+1;
+		dfs(1,-1,0,0);
+		for (int j=1;j<=lg[R];j++)
+			for (int i=1;i+(1<<j)-1<=R;i++)
+			{
+				int a=fa[j-1][i],b=fa[j-1][i+(1<<(j-1))];
+				fa[j][i]=dep[a]<=dep[b]?a:b;
+			}
+		return ;
+	}
+
+	inline int getLCA(int x,int y)
+	{
+		x=pt[x];y=pt[y];
+		if (x>y) swap(x,y);
+		int t=lg[y-x+1];int a=fa[t][x],b=fa[t][y-(1<<t)+1];
+		return dep[a]<=dep[b]?euler[a]:euler[b];
+	}
+
+	inline int getDis(int x,int y)
+	{
+		return dis[x]+dis[y]-2*dis[getLCA(x,y)];
+	}
+}
+
 inline void read(int &x)
 {
 	x = 0;
