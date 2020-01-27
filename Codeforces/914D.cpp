@@ -1,42 +1,51 @@
 #include <bits/stdc++.h>
-#define MAXN 500010
+#define MAXN 500005
 using namespace std;
 
-struct SegmentTree
-{
-	int p,r,m,x;
-};
-
-SegmentTree tree[1<<20];
-int n,q,a[MAXN],cnt,o,l,r,x;
+int n,q,cnt,o,l,r,x,a[MAXN];
+int t[1<<20];
 
 inline int gcd(int a,int b){return !b?a:gcd(b,a%b);}
 
-void BuildTree(int u)
+void BuildTree(int u,int l,int r)
 {
-	if (tree[u].p+1==tree[u].r){tree[u].x=a[tree[u].p];return ;}
-	tree[u].m=tree[u].p+tree[u].r>>1;
-	tree[u<<1].p=tree[u].p;tree[u<<1].r=tree[u].m;BuildTree(u<<1);
-	tree[u<<1|1].p=tree[u].m;tree[u<<1|1].r=tree[u].r;BuildTree(u<<1|1);
-	tree[u].x=gcd(tree[u<<1].x,tree[u<<1|1].x);
+	if (l+1==r){t[u]=a[l];return ;}
+	int m=l+r>>1;BuildTree(u<<1,l,m);BuildTree(u<<1|1,m,r);
+	t[u]=gcd(t[u<<1],t[u<<1|1]);
 	return ;
 }
 
-inline void modify(int u,int x,int v)
+inline void modify(int u,int x,int v,int pl,int pr)
 {
-	if (tree[u].p+1==tree[u].r){tree[u].x=v;return ;}
-	if (x<tree[u].m) modify(u<<1,x,v);
-	else modify(u<<1|1,x,v);
-	tree[u].x=gcd(tree[u<<1].x,tree[u<<1|1].x);
+	if (pl+1==pr){t[u]=v;return ;}
+	int m=pl+pr>>1;
+	if (x<m) modify(u<<1,x,v,pl,m);
+	else modify(u<<1|1,x,v,m,pr);
+	t[u]=gcd(t[u<<1],t[u<<1|1]);
 	return ;
 }
 
-inline void query(int u,int l,int r,int x)
+inline void query(int u,int l,int r,int x,int pl,int pr)
 {
 	if (cnt>1) return ;
-	if (tree[u].p+1==tree[u].r){++cnt;return ;}
-	if (l<=tree[u].m&&tree[u<<1].x%x!=0) query(u<<1,l,r,x);
-	if (r>tree[u].m&&tree[u<<1|1].x%x!=0) query(u<<1|1,l,r,x);
+	if (pl+1==pr){++cnt;return ;}
+	int m=pl+pr>>1;
+	if (r<=m)
+	{
+		if (t[u<<1]%x) query(u<<1,l,r,x,pl,m);
+		return ;
+	}
+	else if (m<=l)
+	{
+		if (t[u<<1|1]%x) query(u<<1|1,l,r,x,m,pr);
+		return ;
+	}
+	else
+	{
+		if (t[u<<1]%x) query(u<<1,l,m,x,pl,m);
+		if (cnt>1) return ;
+		if (t[u<<1|1]%x) query(u<<1|1,m,r,x,m,pr);
+	}
 	return ;
 }
 
@@ -52,7 +61,7 @@ int main()
 {
 	read(n);
 	for (int i=1;i<=n;i++) read(a[i]);
-	tree[1].p=1;tree[1].r=n+1;BuildTree(1);
+	BuildTree(1,1,n+1);
 	read(q);
 	while (q--)
 	{
@@ -60,14 +69,14 @@ int main()
 		if (o==1)
 		{
 			read(l);read(r);read(x);cnt=0;
-			query(1,l,r+1,x);
+			query(1,l,r+1,x,1,n+1);
 			if (cnt>1) puts("NO");
 			else puts("YES");
 		}
 		else
 		{
 			read(l);read(x);
-			modify(1,l,x);
+			modify(1,l,x,1,n+1);
 		}
 	}
 	return 0;

@@ -76,8 +76,8 @@ inline int getdis(int x,int y)
 inline void DFS_size_and_G(int x,int fa)
 {
 	siz[x]=1;mx[x]=0;
-	for(int i=head[x];~i;i=e[i].nxt)
-		if(e[i].to!=fa&&!vis[e[i].to])
+	for (int i=head[x];~i;i=e[i].nxt)
+		if (e[i].to!=fa&&!vis[e[i].to])
 		{
 			DFS_size_and_G(e[i].to,x);
 			siz[x]+=siz[e[i].to];
@@ -112,8 +112,8 @@ void Calc(int x,int fa,int v)
 inline void TreeDC(int x)
 {
 	vis[x]=true;
-	for(int i=head[x];~i;i=e[i].nxt)
-		if(!vis[e[i].to])
+	for (int i=head[x];~i;i=e[i].nxt)
+		if (!vis[e[i].to])
 		{
 			mx[0]=SIZE=siz[e[i].to];G=0;
 			DFS_size_and_G(e[i].to,x);f[G]=x;
