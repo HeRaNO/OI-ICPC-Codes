@@ -1,162 +1,148 @@
 #include <cstdio>
 #include <algorithm>
-#define MAXN 1000010
+#define MAXN 300005
+#define MAXT 1000005
+#define DM 2
 #define INF ~(1<<31)
 using namespace std;
 
+int ND;
+
 struct point
 {
-	int x, y;
-	inline int myabs(const int x)const
-	{
-		return x > 0 ? x : -x;
+	int x[DM];
+	bool operator < (const point &a)const {
+		return x[ND]<a.x[ND];
 	}
-	inline int Dis(const point &a)const
-	{
-		return myabs(x - a.x) + myabs(y - a.y);
+	inline int Dis(const point &a)const {
+		int r=0;
+		for (int i=0;i<DM;i++) r+=abs(x[i]-a.x[i]);
+		return r;
 	}
 };
 
-bool cmpx(point a, point b)
-{
-	return a.x < b.x;
-}
-bool cmpy(point a, point b)
-{
-	return a.y < b.y;
-}
-inline int mymin(int a, int b)
-{
-	return a < b ? a : b;
-}
-inline int mymax(int a, int b)
-{
-	return a > b ? a : b;
-}
-
 struct KDTree
 {
-	int lch, rch;
-	point P;
-	int mxx, mxy, mnx, mny;
-	inline int MinDis(const point &p)const
-	{
+	int lch, rch, siz;
+	point P;int mx[DM],mn[DM];
+	inline int MinDis(const point &p)const {
 		int ans = 0;
-		if (p.x < mnx) ans += mnx - p.x;
-		if (p.x > mxx) ans += p.x - mxx;
-		if (p.y < mny) ans += mny - p.y;
-		if (p.y > mxy) ans += p.y - mxy;
+		for (int i=0;i<DM;i++)
+			ans+=max(0,p.x[i]-mx[i])+max(0,mn[i]-p.x[i]);
 		return ans;
 	}
 };
 
-point p[MAXN >> 1], t;
-KDTree tree[MAXN];
-int n, T, x, top = 1, res, opt;
+point p[MAXN],t;
+KDTree tree[MAXT];
+int n,T,x,res,opt,pool[MAXT],top,tot,rt;
 
-inline void Push_Up(int x, int y)
+inline void PushUp(int x)
 {
-	tree[x].mxx = mymax(tree[x].mxx, tree[y].mxx);
-	tree[x].mnx = mymin(tree[x].mnx, tree[y].mnx);
-	tree[x].mxy = mymax(tree[x].mxy, tree[y].mxy);
-	tree[x].mny = mymin(tree[x].mny, tree[y].mny);
+	int l=tree[x].lch,r=tree[x].rch;
+	for (int i=0;i<DM;i++)
+	{
+		tree[x].mx[i]=tree[x].mn[i]=tree[x].P.x[i];
+		if (l)
+		{
+			tree[x].mn[i]=min(tree[x].mn[i],tree[l].mn[i]);
+			tree[x].mx[i]=max(tree[x].mx[i],tree[l].mx[i]);
+		}
+		if (r)
+		{
+			tree[x].mn[i]=min(tree[x].mn[i],tree[r].mn[i]);
+			tree[x].mx[i]=max(tree[x].mx[i],tree[r].mx[i]);
+		}
+	}
+	tree[x].siz=tree[l].siz+tree[r].siz+1;
 	return ;
 }
 
-inline void Build_KDTree(int u, int l, int r, bool D)
+inline int newnode()
 {
-	int mid = l + r >> 1;
-	nth_element(p + l, p + mid, p + r + 1, D ? cmpy : cmpx);
-	tree[u].P = p[mid];
-	tree[u].mxx = tree[u].mnx = p[mid].x;
-	tree[u].mxy = tree[u].mny = p[mid].y;
-	if (l <= mid - 1)
-	{
-		tree[u].lch = ++top;
-		Build_KDTree(top, l, mid - 1, !D);
-	}
-	if (mid + 1 <= r)
-	{
-		tree[u].rch = ++top;
-		Build_KDTree(top, mid + 1, r, !D);
-	}
-	if (tree[u].lch) Push_Up(u, tree[u].lch);
-	if (tree[u].rch) Push_Up(u, tree[u].rch);
+	if (top) return pool[top--];
+	return ++tot;
+}
+
+inline int Build(int l,int r,int d)
+{
+	if (l>r) return 0;
+	int k=newnode(),mid=l+r>>1;
+	ND=d;nth_element(p+l,p+mid,p+r+1);tree[k].P=p[mid];
+	tree[k].lch=Build(l,mid-1,(d+1)%DM);tree[k].rch=Build(mid+1,r,(d+1)%DM);
+	PushUp(k);return k;
+}
+
+void flat(int x,int cnt)
+{
+	int l=tree[x].lch,r=tree[x].rch;
+	if (l) flat(l,cnt);
+	p[cnt+tree[l].siz+1]=tree[x].P;pool[++top]=x;
+	if (r) flat(r,cnt+tree[l].siz+1);
+}
+
+const int alpha_a=2;
+const int alpha_b=3;
+
+void Rebuild(int &x,int d)
+{
+	int l=tree[x].lch,r=tree[x].rch;
+	if (alpha_a*tree[x].siz<alpha_b*tree[l].siz||alpha_a*tree[x].siz<alpha_b*tree[r].siz)
+		flat(x,0),x=Build(1,tree[x].siz,d);
 	return ;
 }
 
-inline void add(int u, point P, bool D, int father, bool way)
+void add(int &x,int d)
 {
-	if (!u)
+	if (!x)
 	{
-		top++;
-		if (!way) tree[father].lch = top;
-		else tree[father].rch = top;
-		tree[top].P = P;
-		tree[top].mxx = tree[top].mnx = P.x;
-		tree[top].mxy = tree[top].mny = P.y;
+		x=newnode();
+		tree[x].P=t;tree[x].lch=tree[x].rch=0;PushUp(x);
 		return ;
 	}
-	if ((D ? cmpy : cmpx)(P, tree[u].P))
-	{
-		add(tree[u].lch, P, !D, u, false);
-		Push_Up(u, tree[u].lch);
-	}
-	else
-	{
-		add(tree[u].rch, P, !D, u, true);
-		Push_Up(u, tree[u].rch);
-	}
+	if (tree[x].P.x[d]<t.x[d]) add(tree[x].rch,(d+1)%DM);
+	else add(tree[x].lch,(d+1)%DM);
+	PushUp(x);Rebuild(x,d);
 	return ;
 }
 
-inline void query(int u, point P)
+inline void query(int u)
 {
-	res = mymin(res, tree[u].P.Dis(P));
-	int ldis = tree[u].lch ? tree[tree[u].lch].MinDis(P) : INF;
-	int rdis = tree[u].rch ? tree[tree[u].rch].MinDis(P) : INF;
-	if (ldis < rdis)
+	res=min(res,tree[u].P.Dis(t));
+	int ldis=tree[u].lch?tree[tree[u].lch].MinDis(t):INF;
+	int rdis=tree[u].rch?tree[tree[u].rch].MinDis(t):INF;
+	if (ldis<rdis)
 	{
-		if (tree[u].lch && res > ldis) query(tree[u].lch, P);
-		if (tree[u].rch && res > rdis) query(tree[u].rch, P);
+		if (tree[u].lch&&res>ldis) query(tree[u].lch);
+		if (tree[u].rch&&res>rdis) query(tree[u].rch);
 	}
 	else
 	{
-		if (tree[u].rch && res > rdis) query(tree[u].rch, P);
-		if (tree[u].lch && res > ldis) query(tree[u].lch, P);
+		if (tree[u].rch&&res>rdis) query(tree[u].rch);
+		if (tree[u].lch&&res>ldis) query(tree[u].lch);
 	}
 	return ;
 }
 
 inline void read(int &x)
 {
-	x = 0;
-	char ch = getchar();
-	while (ch < '0' || ch > '9') ch = getchar();
-	while (ch >= '0' && ch <= '9') x = x * 10 + ch - '0', ch = getchar();
+	x=0;char ch=getchar();
+	while (ch<'0'||ch>'9') ch=getchar();
+	while (ch>='0'&&ch<='9') x=(x<<3)+(x<<1)+ch-'0',ch=getchar();
 	return ;
 }
 
 int main()
 {
 	//freopen("angel.in","r",stdin);freopen("angel.out","w",stdout);
-	read(n);
-	read(T);
-	for (int i = 1; i <= n; i++) read(p[i].x), read(p[i].y);
-	Build_KDTree(1, 1, n, false);
+	read(n);read(T);
+	for (int i=1;i<=n;i++) read(p[i].x[0]),read(p[i].x[1]);
+	rt=Build(1,n,0);
 	while (T--)
 	{
-		read(opt);
-		read(t.x);
-		read(t.y);
-		opt--;
-		if (!opt) add(1, t, false, 0, false);
-		else
-		{
-			res = INF;
-			query(1, t);
-			printf("%d\n", res);
-		}
+		read(opt);read(t.x[0]);read(t.x[1]);
+		if (opt==1) add(rt,0);
+		else res=INF,query(rt),printf("%d\n",res);
 	}
 	return 0;
 }
