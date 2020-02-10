@@ -131,6 +131,8 @@ Code：HeRaNO
 
 $0\le D_{i-1}\le D_i\le 10^5,1\le n\le 200,1\le k\le 10^5$
 
+目测是一个树上背包。
+
 # O. Alice's distence tree
 
 一棵树，边权给定，求前 $m$ 长的路径长度。数据随机。
@@ -146,3 +148,5 @@ Code：Decision
 一棵树，多次询问，每次给出 $[L,R]$，表示编号范围在 $[L,R]$ 的点是安全的，再给一个 $x$，求点 $x$ 到安全的点最近距离。
 
 $1\le n,q\le 10^5$
+
+原题来自 [LibreOJ #6145](https://loj.ac/problem/6145)，是屑。
