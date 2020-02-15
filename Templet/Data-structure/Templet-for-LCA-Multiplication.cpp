@@ -99,9 +99,9 @@ namespace RMQLCA
 
 	inline void RMQLCA()
 	{
+		dfs(1,-1,0,0);
 		for (int i=1;i<=R;i++) fa[0][i]=i;
 		for (int i=2;i<=R;i++) lg[i]=lg[i>>1]+1;
-		dfs(1,-1,0,0);
 		for (int j=1;j<=lg[R];j++)
 			for (int i=1;i+(1<<j)-1<=R;i++)
 			{
