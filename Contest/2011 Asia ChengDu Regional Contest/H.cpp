@@ -1,0 +1,71 @@
+#include <bits/stdc++.h>
+#define ll long long
+#define ls id << 1
+#define rs id << 1 | 1
+#define mem(array, value, size, type) memset(array, value, ((size) + 5) * sizeof(type))
+#define memarray(array, value) memset(array, value, sizeof(array))
+#define pb(x) push_back(x)
+#define st(x) (1LL << (x))
+#define pii pair<int, int>
+#define mp(a, b) make_pair((a), (b))
+using namespace std;
+const int N = 100050;
+const int inf = 0x3f3f3f3f;
+const ll mod = 998244353LL;
+clock_t TIME_START, TIME_END;
+void program_end()
+{
+#ifdef ONLINE
+	printf("\nTime used: %.6lf(s)\n", ((double)TIME_END - TIME_START) / CLOCKS_PER_SEC);
+	system("pause");
+#endif
+}
+int n;
+int kase;
+ll ans;
+vector<pair<int, ll>> e[N];
+ll siz[N];
+void dfs(int u, int fa)
+{
+	siz[u] = 1;
+	for (auto v : e[u])
+	{
+		if (v.first == fa)
+			continue;
+		dfs(v.first, u);
+		siz[u] += siz[v.first];
+		ans += min(siz[v.first], n - siz[v.first]) * v.second * 2;
+	}
+}
+
+void solve()
+{
+	printf("Case #%d: ", ++kase);
+	scanf("%d", &n);
+	ans = 0;
+	for (int i = 0; i <= n; ++i)
+		e[i].clear();
+	for (int i = 1; i < n; ++i)
+	{
+		int x, y;
+		ll val;
+		scanf("%d%d%lld", &x, &y, &val);
+		e[x].push_back({y, val});
+		e[y].push_back({x, val});
+	}
+	mem(siz, 0, n, ll);
+	dfs(1, 0);
+	printf("%lld\n ", ans);
+}
+
+int main()
+{
+	TIME_START = clock();
+	int Test = 1;
+	cin >> Test;
+	while (Test--)
+		solve();
+	TIME_END = clock();
+	program_end();
+	return 0;
+}
