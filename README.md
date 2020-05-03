@@ -6,6 +6,7 @@ Some solutions to OI / ICPC problems. They're from:
 - [BZOJ](https://www.lydsy.com/JudgeOnline/)
 - [CodeChef](https://www.codechef.com/)
 - [Codeforces](https://codeforces.com/)
+- [COGS](http://cogs.pro:8081/cogs/)
 - [HDU](http://acm.hdu.edu.cn/)
 - HSAHRBNUOJ: My high school's OJ. Because of the issues of copyright, the website won't be given.
 - [LibreOJ](https://loj.ac/)
