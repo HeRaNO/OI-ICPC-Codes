@@ -9,7 +9,7 @@ using namespace std;
 
 long long x[1 << 19], lazy[1 << 19];
 int n, T, R = 1, u, v, o, top;
-int fib[logN], label[MAXN], a[MAXN];
+int fib[logN], label[MAXN], a[MAXN], rev[MAXN];
 int range[2][MAXN][logN], sta[MAXN];
 queue <int> q;
 vector <int> g[MAXN];
@@ -18,14 +18,15 @@ inline void BFS_Relabel()
 {
 	fib[1] = fib[2] = 1;
 	for (int i = 3; fib[i - 1] <= n; i++) fib[i] = fib[i - 1] + fib[i - 2];
-	fib[1] = 0; q.push(1); label[1] = R;
+	fib[1] = 0; q.push(1); label[1] = R; rev[R] = 1;
 	while (!q.empty())
 	{
 		int u = q.front(); q.pop();
 		for (auto v : g[u])
 			if (!label[v])
 			{
-				label[v] = ++R;
+				rev[++R] = v;
+				label[v] = R;
 				q.push(v);
 			}
 	}
@@ -66,7 +67,7 @@ inline void BuildTree(int u, int l, int r)
 {
 	if (l + 1 == r)
 	{
-		x[u] = a[label[l]];
+		x[u] = a[rev[l]];
 		return ;
 	}
 	int m = l + r >> 1;
