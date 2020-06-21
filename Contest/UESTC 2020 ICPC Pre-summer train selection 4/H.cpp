@@ -1,0 +1,101 @@
+#include <bits/stdc++.h>
+#define MAXN 205
+using namespace std;
+
+const double eps=1e-7;
+
+struct Point
+{
+	int x,y;
+	Point(){}
+	Point(int _x,int _y):x(_x),y(_y){}
+	Point operator - (const Point &p2)const{
+		return Point(x-p2.x,y-p2.y);
+	}
+	bool operator < (const Point p)const{
+		if (p.x!=x) return p.x>x;
+		return p.y>y;
+	}
+	int operator * (const Point &p2) {
+		return x*p2.y-y*p2.x;
+	}
+};
+
+int T,m,n,c;
+Point p[MAXN],ch[MAXN];
+
+int ConvexHull(Point *p,int n)
+{
+	memset(ch,0,sizeof ch);
+	sort(p,p+n);int m=0;
+	for (int i=0;i<n;i++)
+	{
+		while (m>1&&(ch[m-1]-ch[m-2])*(p[i]-ch[m-2])<=0) --m;
+		ch[m++]=p[i];
+	}
+	int k=m;
+	for (int i=n-2;~i;i--)
+	{
+		while (m>k&&(ch[m-1]-ch[m-2])*(p[i]-ch[m-2])<=0) --m;
+		ch[m++]=p[i];
+	}
+	if (n>1) --m;
+	return m;
+}
+
+inline bool in(int x,int y,int c)
+{
+	double k=sqrt(2),b=y-k*x;int cnt=0;Point O=Point(x,y);
+	for (int i=0;i<c;i++) if (ch[i].x==x&&ch[i].y==y) return false;
+	for (int i=0;i<c;i++)
+	{
+		Point oa=ch[i]-O;
+		Point ob=ch[(i+1)%c]-O;
+		if (!(oa*ob)) return false;
+	}
+	//puts("here");
+	for (int i=0;i<c;i++)
+	{
+		int A=ch[(i+1)%c].y-ch[i].y;
+		int B=ch[i].x-ch[(i+1)%c].x;
+		int C=ch[(i+1)%c]*ch[i];
+		double lx=min(ch[i].x,ch[(i+1)%c].x),rx=max(ch[i].x,ch[(i+1)%c].x);
+		double ly=min(ch[i].y,ch[(i+1)%c].y),ry=max(ch[i].y,ch[(i+1)%c].y);
+		double nx=-(B*b+C)/(A+B*k);
+		double ny=k*nx+b;
+		//printf("%lf %lf\n",nx,ny);
+		if (ny>y) continue;
+		//printf("t: %lf %lf\n",nx,ny);
+		//printf("%lf %lf %lf, %lf %lf %lf\n",lx,nx,rx,ly,ny,ry);
+		if (lx-eps<=nx&&nx<=rx+eps&&ly-eps<=ny&&ny<=ry+eps) ++cnt;
+	}
+	//printf("%d\n",cnt);
+	return cnt&1;
+}
+
+set<pair<int,int>>sett;
+int main()
+{
+    //freopen("04.in","r",stdin);
+    //freopen("05.out","w",stdout);
+	scanf("%d",&T);
+	for (int cas=1;cas<=T;cas++)
+	{
+	    sett.clear();
+		printf("Case %d\n",cas);
+		scanf("%d %d",&n,&m);
+		for (int i=0;i<n;i++) scanf("%d %d",&p[i].x,&p[i].y),sett.insert({p[i].x,p[i].y});
+		assert(sett.size()==n);
+		c=ConvexHull(p,n);
+		for (int i=0;i<=c;i++) printf("%d %d\n",ch[i%c].x,ch[i%c].y);
+		for (int i=1;i<=m;i++)
+		{
+			int x,y;
+			scanf("%d %d",&x,&y);;
+			if (in(x,y,c)) printf("%d %d is unsafe!\n",x,y);
+			else printf("%d %d is safe!\n",x,y);
+		}
+		puts("");
+	}
+	return 0;
+}
