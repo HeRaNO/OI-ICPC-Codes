@@ -2,6 +2,8 @@
 #define MAXN 55
 using namespace std;
 
+const double eps=1e-7;
+
 struct Point
 {
 	int x,y;
@@ -43,7 +45,7 @@ int ConvexHull(Point *p,int n)
 inline bool in(int x,int y,int c)
 {
 	double k=sqrt(2),b=y-k*x;int cnt=0;Point O=Point(x,y);
-	for (int i=0;i<c;i++) if (p[i].x==x&&p[i].y==y) return false;
+	for (int i=0;i<c;i++) if (ch[i].x==x&&ch[i].y==y) return false;
 	for (int i=0;i<c;i++)
 	{
 		Point oa=ch[i]-O;
@@ -55,12 +57,12 @@ inline bool in(int x,int y,int c)
 		int A=ch[(i+1)%c].y-ch[i].y;
 		int B=ch[i].x-ch[(i+1)%c].x;
 		int C=ch[(i+1)%c]*ch[i];
-		int lx=min(ch[i].x,ch[(i+1)%c].x),rx=max(ch[i].x,ch[(i+1)%c].x);
-		int ly=min(ch[i].y,ch[(i+1)%c].y),ry=max(ch[i].y,ch[(i+1)%c].y);
+		double lx=min(ch[i].x,ch[(i+1)%c].x),rx=max(ch[i].x,ch[(i+1)%c].x);
+		double ly=min(ch[i].y,ch[(i+1)%c].y),ry=max(ch[i].y,ch[(i+1)%c].y);
 		double nx=-(B*b+C)/(A+B*k);
 		double ny=k*nx+b;
 		if (ny>y) continue;
-		if (lx<=nx&&nx<=rx&&ly<=ny&&ny<=ry) ++cnt;
+		if (lx-eps<=nx&&nx<=rx+eps&&ly-eps<=ny&&ny<=ry+eps) ++cnt;
 	}
 	return cnt&1;
 }
