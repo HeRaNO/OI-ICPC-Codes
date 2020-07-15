@@ -27,11 +27,17 @@ long long exgcd(long long a, long long b, long long &x, long long &y)
 		y = 0;
 		return a;
 	}
-	long long res = exgcd(b, a % b, x, y);
-	long long t = x;
-	x = y;
-	y = t - (a / b) * y;
+	long long res = exgcd(b, a % b, y, x);
+	y -= (a / b) * x;
 	return res;
+}
+
+//Get a^{-1} (mod m)
+inline long long inv(long long a, long long m)
+{
+	long long x, y;
+	exgcd(a, m, x, y);
+	return (x + m) % m;
 }
 
 //By using phi(n),you can get the Euler function of n
@@ -127,54 +133,24 @@ inline void Linear_Shaker(int n)
     By using BSGS(a,b,c),you can get the minimum solution of the equation:
     a^x==b (mod c)
 */
-#define HMOD 1000007LL
-struct hash_link
-{
-	long long ori;
-	long long val;
-	int nxt;
-};
 
-hash_link e[HMOD << 2];
-int edge_num[HMOD], cnt;
+unordered_map <long long, long long> mp;
 
-inline void add(long long x, long long y)
+long long exBSGS(long long a, long long b, long long M)
 {
-	long long ori = x;
-	x %= HMOD;
-	for (int i = edge_num[x]; ~i; i = e[i].nxt)
-		if (e[i].ori == ori) return ;
-	e[cnt] = (hash_link)
+	if (b == 1) return 0;
+	long long w = 1; int c = 0;
+	for (long long d; (d = gcd(a, M)) != 1;)
 	{
-		ori, y, edge_num[x]
-	};
-	edge_num[x] = cnt++;
-	return ;
-}
-
-inline long long query(long long x)
-{
-	long long ori = x;
-	x %= HMOD;
-	for (int i = edge_num[x]; ~i; i = e[i].nxt)
-		if (e[i].ori == ori) return e[i].val;
-	return -1LL;
-}
-
-long long exBSGS(long long a, long long b, long long MOD)
-{
-	memset(edge_num, -1, sizeof edge_num);
-	cnt = 0;
-	long long M = ceil(sqrt(MOD));
-	long long t = 1LL, r = 1LL, x, y;
-	for (long long i = 0; i < M; i++, t = t * a % MOD) add(t, i);
-	for (long long i = 0; i <= M; i++, r = r * t % MOD)
-	{
-		exgcd(r, MOD, x, y);
-		x = (x * b % MOD + MOD) % MOD;
-		int res = query(x);
-		if (res != -1) return i * M + res;
+		if (b % d) return -1;
+		b /= d; M /= d; ++c; w = w * (a / d) % M;
+		if (w == b) return c;
 	}
+	b = b * inv(w, M) % M; mp.clear();
+	long long t = 1LL, r = b, x, y, B=ceil(sqrt(M));
+	for (long long i = 0; i < B; i++, t = t * a%M) if (!mp.count(t)) mp.insert({t, i});
+	t = inv(t, M);
+	for (long long i = 0; i < B; i++, b = b * t % M) if (mp.count(b)) return i * B + mp[b] + c;
 	return -1LL;
 }
 
@@ -206,24 +182,82 @@ inline void Gauss_Elimination(int n)
 	return ;
 }
 
-//By using KSM(a,b,MOD),you can figure out a^b%MOD.
-long long KSM(long long a, long long b, long long MOD)
+struct Matrix
 {
-	long long res = 1, base = a;
-	while (b)
+	long long m[MAXN][MAXN];
+}inv;
+
+bool vis[MAXN];
+long long det;
+int rnk;
+
+inline void getDetRankInv(Matrix a)
+{
+	memset(vis, 0, sizeof vis);
+	det = 1; rnk = n;
+	for (int i = 1; i <= n; i++)
+		for (int j = 1; j <= n; j++)
+			inv.m[i][j] = i == j;
+	for (int i = 1; i <= n; i++)
 	{
-		if (b & 1) res = (res * base) % MOD;
-		base = (base * base) % MOD;
-		b >>= 1;
+		int now = 0;
+		for (int j = 1; j <= n && !now; j++) if (!vis[j] && a.m[j][i]) now = j;
+		if (!now){ --rnk; continue; }
+		if (now != i) det = -det;
+		vis[i] = true;
+		for (int j = 1; j <= n; j++)
+		{
+			swap(a.m[now][j], a.m[i][j]);
+			swap(inv.m[now][j], inv.m[i][j]);
+		}
+		long long t = inv(a.m[i][i], M);
+		for (int j = 1; j <= n; j++)
+			if (j != i)
+			{
+				long long x = a.m[j][i] * t % M;
+				for (int k = 1; k <= n; k++) 
+				{
+					a.m[j][k] -= x * a.m[i][k] % M; (a.m[j][k] += M) %= M;
+					inv.m[j][k] -= x * inv.m[i][k]%M; (inv.m[j][k] += M) %= M;
+				}
+			}
 	}
-	return res % MOD;
+	det = (det + M) % M;
+	for (int i = 1; i <= n; i++)
+	{
+		(det *= a.m[i][i]) %= M;
+		long long t = inv(a.m[i][i], M);
+		for (int j = 1; j <= n; j++) (inv.m[i][j] *= t) %= M;
+	}
+	return ;
+}
+
+inline Matrix Gauss_Elimination(Matrix a)
+{
+	memset(vis, false, sizeof vis);
+	for (int i = 1; i <= n; i++)
+	{
+		int now = 0;
+		for (int j = 1; j <= n && !now; j++) if (!vis[j] && a.m[j][i]) now = j;
+		if (!now) continue;
+		vis[i] = true;
+		for (int j = 1; j <= n; j++) swap(a.m[now][j], a.m[i][j]);
+		long long t = inv(a.m[i][i], M);
+		for (int j = 1; j <= n; j++)
+			if (j != i)
+			{
+				long long x = a.m[j][i] * t % M;
+				for (int k = 1; k <= n; k++) a.m[j][k] -= x * a.m[i][k] % M, (a.m[j][k] += M) %= M;
+			}
+	}
+	return a;
 }
 
 //By using Get_Factor_and_Inv(n,MOD),you can get i! and i^(-1) and i^(-1)!.
 long long fac[MAXN], inv[MAXN], invfac[MAXN];
 inline void Get_Factor_and_Inv(int n, long long MOD)
 {
-	inv[1] = fac[1] = invfac[0] = invfac[1] = 1LL;
+	inv[1] = fac[0] = invfac[0] = 1LL;
 	for (int i = 2; i <= n; i++) inv[i] = (MOD - MOD / i) * inv[MOD % i] % MOD;
 	for (int i = 2; i <= n; i++) fac[i] = (fac[i - 1] * i) % MOD, invfac[i] = (invfac[i - 1] * inv[i]) % MOD;
 	return ;
@@ -247,55 +281,6 @@ long long Lucas_C(long long m, long long n, long long MOD)
 	if (n < m) return 0LL;
 	if (n < MOD && m < MOD) return C(m, n, MOD);
 	return Lucas_C(n / MOD, m / MOD, MOD) * Lucas_C(n % MOD, m % MOD, MOD) % MOD;
-}
-
-/*
-    Some code about matrix.
-    define the matrix has r rows and c columns.
-*/
-#define N 110
-struct matrix
-{
-	int r, c;
-	int m[N][N];
-};
-
-matrix fib, base, em;
-
-matrix multiply(matrix a, matrix b, long long MOD)
-{
-	if (a.c != b.r) return em;
-	matrix res;
-	res.r = a.r;
-	res.c = b.c;
-	for (int i = 0; i < a.r; i++)
-		for (int j = 0; j < b.c; j++)
-		{
-			res.m[i][j] = 0;
-			for (int k = 0; k < a.c; k++)
-				res.m[i][j] = (res.m[i][j] + a.m[i][k] * b.m[k][j]) % MOD;
-		}
-	return res;
-}
-
-/*
-    By using get_Fibonacci(n,MOD),you can get the nth term of Fibonacci.
-    define F[0]=1,F[1]=1,F[2]=2......
-*/
-long long get_Fibonacci(int n, long long MOD)
-{
-	fib.r = fib.c = base.r = base.c = 2LL;
-	fib.m[0][0] = fib.m[0][1] = fib.m[1][0] = 1LL;
-	fib.m[1][1] = 0LL;
-	base.m[0][0] = base.m[0][1] = base.m[1][0] = 1LL;
-	base.m[1][1] = 0LL;
-	while (n)
-	{
-		if (n & 1) fib = multiply(fib, base, MOD);
-		base = multiply(base, base, MOD);
-		n >>= 1;
-	}
-	return fib.m[0][1];
 }
 
 int main()
