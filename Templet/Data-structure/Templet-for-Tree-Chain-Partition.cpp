@@ -4,122 +4,85 @@
 #define MAXN 100010
 using namespace std;
 
-struct link
-{
-	int to;
-	int nxt;
-};
-
-struct SegmentTree
-{
-	int p, r, m;
-	int sum, lazy;
-};
-
-link e[MAXN << 1];
-SegmentTree tree[MAXN << 1];
-int edge_num[MAXN], cnt;
-int pos[MAXN], top[MAXN], father[MAXN];
-int in[MAXN], out[MAXN], dep[MAXN], siz[MAXN], maxx[MAXN];
+long long x[1 << 18], lazy[1 << 18];
+int rev[MAXN], top[MAXN], fa[MAXN];
+int in[MAXN], out[MAXN], dep[MAXN], siz[MAXN], mx[MAXN];
 int n, T, R = 1, opt, u, v;
+vector <int> g[MAXN];
 
-inline void add(int u, int v)
+inline void dfs1(int x)
 {
-	e[cnt] = (link)
-	{
-		v, edge_num[u]
-	};
-	edge_num[u] = cnt++;
-	e[cnt] = (link)
-	{
-		u, edge_num[v]
-	};
-	edge_num[v] = cnt++;
-}
-
-inline void dfs1(int node)
-{
-	siz[node] = 1;
-	maxx[node] = -1;
-	for (int i = edge_num[node]; ~i; i = e[i].nxt)
-		if (e[i].to != father[node])
+	siz[x] = 1; mx[x] = -1;
+	for (auto v : g[x])
+		if (v != fa[x])
 		{
-			dep[e[i].to] = dep[node] + 1;
-			father[e[i].to] = node;
-			dfs1(e[i].to);
-			siz[node] += siz[e[i].to];
-			if (!~maxx[node] || siz[e[i].to] > siz[maxx[node]]) maxx[node] = e[i].to;
+			dep[v] = dep[x] + 1; fa[v] = x;
+			dfs1(v);
+			siz[x] += siz[v];
+			if (!~mx[x] || siz[v] > siz[mx[x]]) mx[x] = v;
 		}
 	return ;
 }
 
-inline void dfs2(int node, int t)
+inline void dfs2(int x, int t)
 {
-	top[node] = t;
-	pos[node] = in[node] = R++;
-	if (~maxx[node]) dfs2(maxx[node], t);
-	for (int i = edge_num[node]; ~i; i = e[i].nxt)
-		if (e[i].to != maxx[node] && e[i].to != father[node]) dfs2(e[i].to, e[i].to);
-	out[node] = R;
+	top[x] = t; rev[R] = x; in[x] = R++;
+	if (~mx[x]) dfs2(mx[x], t);
+	for (auto v : g[x])
+		if (v != mx[x] && v != fa[x]) dfs2(v, v);
+	out[x] = R;
 	return ;
 }
 
-inline void Push_Up(int u)
+inline void add(int u, int l, int r, long long v)
 {
-	tree[u].sum = tree[u << 1].sum + tree[u << 1 | 1].sum;
+	x[u] += (r - l) * v; lazy[u] += v;
 	return ;
 }
 
-inline void Push_Down(int u)
+inline void PushDown(int u, int l, int r)
 {
-	tree[u << 1].sum += (tree[u << 1].r - tree[u << 1].p) * tree[u].lazy;
-	tree[u << 1].lazy += tree[u].lazy;
-	tree[u << 1 | 1].sum += (tree[u << 1 | 1].r - tree[u << 1 | 1].p) * tree[u].lazy;
-	tree[u << 1 | 1].lazy += tree[u].lazy;
-	tree[u].lazy = 0;
+	if (!lazy[u]) return ;
+	int m = l + r >> 1;
+	add(u << 1, l, m, lazy[u]); add(u << 1 | 1, m, r, lazy[u]);
+	lazy[u] = 0;
 	return ;
 }
 
-inline void Build_A_Tree(int u)
+inline void BuildTree(int u, int l, int r)
 {
-	if (tree[u].p + 1 == tree[u].r) return ;
-	tree[u].m = tree[u].p + tree[u].r >> 1;
-	tree[u << 1].p = tree[u].p;
-	tree[u << 1].r = tree[u].m;
-	Build_A_Tree(u << 1);
-	tree[u << 1 | 1].p = tree[u].m;
-	tree[u << 1 | 1].r = tree[u].r;
-	Build_A_Tree(u << 1 | 1);
+	if (tree[u].p + 1 == tree[u].r) { x[u] = a[rev[l]]; return ; }
+	int m = l + r >> 1; BuildTree(u << 1, l, m); BuildTree(u << 1 | 1, m, r);
+	x[u] = x[u << 1] + x[u << 1 | 1];
 	return ;
 }
 
-inline void modify(int u, int l, int r, int v)
+inline void modify(int u, int l, int r, int v, int pl, int pr)
 {
-	if (tree[u].p == l && tree[u].r == r)
+	if (pl == l && pr == r)
 	{
-		tree[u].lazy += v;
-		tree[u].sum += (tree[u].r - tree[u].p) * v;
+		add(u, v);
 		return ;
 	}
-	Push_Down(u);
-	if (r <= tree[u].m) modify(u << 1, l, r, v);
-	else if (l >= tree[u].m) modify(u << 1 | 1, l, r, v);
+	PushDown(u, pl, pr); int m = pl + pr >> 1;
+	if (r <= m) modify(u << 1, l, r, v, pl, m);
+	else if (m <= l) modify(u << 1 | 1, l, r, v, m, pr);
 	else
 	{
-		modify(u << 1, l, tree[u].m, v);
-		modify(u << 1 | 1, tree[u].m, r, v);
+		modify(u << 1, l, m, v, pl, m);
+		modify(u << 1 | 1, m, r, v, m, pr);
 	}
-	Push_Up(u);
+	x[u] = x[u << 1] + x[u << 1 | 1];
 	return ;
 }
 
-inline int query(int u, int l, int r)
+inline long long query(int u, int l, int r, int pl, int pr)
 {
-	if (tree[u].p == l && tree[u].r == r) return tree[u].sum;
-	Push_Down(u);
-	if (r <= tree[u].m) return query(u << 1, l, r);
-	else if (l >= tree[u].m) return query(u << 1 | 1, l, r);
-	else return query(u << 1, l, tree[u].m) + query(u << 1 | 1, tree[u].m, r);
+	if (pl == l && pr == r) return x[u];
+	PushDown(u, pl, pr); int m = pl + pr >> 1;
+	if (r <= m) return query(u << 1, l, r, pl, m);
+	else if (m <= l) return query(u << 1 | 1, l, r, m, pr);
+	else return query(u << 1, l, m, pl, m) + query(u << 1 | 1, m, r, m, pr);
 }
 
 inline void modify_link(int l, int r, int v)
@@ -127,11 +90,12 @@ inline void modify_link(int l, int r, int v)
 	while (top[l] != top[r])
 	{
 		if (dep[top[l]] < dep[top[r]]) swap(l, r);
-		modify(1, pos[top[l]], pos[l] + 1, v);
-		l = father[top[l]];
+		modify(1, in[top[l]], in[l] + 1, v, 1, n + 1);
+		l = fa[top[l]];
 	}
-	if (pos[l] > pos[r]) swap(l, r);
-	modify(1, pos[l], pos[r] + 1, v);
+	if (in[l] > in[r]) swap(l, r);
+	modify(1, in[l], in[r] + 1, v, 1, n + 1); // Weight on vertex
+	// if (in[l] < in[r]) modify(1, in[l] + 1, in[r] + 1, v, 1, n + 1) // Weight on edge
 	return ;
 }
 
@@ -141,11 +105,12 @@ inline int query_link(int l, int r)
 	while (top[l] != top[r])
 	{
 		if (dep[top[l]] < dep[top[r]]) swap(l, r);
-		res += query(1, pos[top[l]], pos[l] + 1);
-		l = father[top[l]];
+		res += query(1, in[top[l]], in[l] + 1, 1, n + 1);
+		l = fa[top[l]];
 	}
-	if (pos[l] > pos[r]) swap(l, r);
-	res += query(1, pos[l], pos[r] + 1);
+	if (in[l] > in[r]) swap(l, r);
+	res += query(1, in[l], in[r] + 1, 1, n + 1);
+	// if (in[l] < in[r]) res += query(1, in[l] + 1, in[r] + 1, 1, n + 1) // Weight on edge
 	return res;
 }
 
