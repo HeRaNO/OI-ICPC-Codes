@@ -3,7 +3,7 @@
 Some solutions to OI / ICPC problems. They're from:
 
 - [AtCoder](https://atcoder.jp/)
-- [BZOJ](https://www.lydsy.com/JudgeOnline/)
+- [BZOJ](https://darkbzoj.tk/)
 - [CodeChef](https://www.codechef.com/)
 - [Codeforces](https://codeforces.com/)
 - [COGS](http://cogs.pro:8081/cogs/)
