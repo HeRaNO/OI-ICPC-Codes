@@ -55,9 +55,9 @@ struct line
 	point p, v;
 	line() {}
 	line(const point &_p, const point &_v): p(_p), v(_v) {}
-	bool On_Left(const point &p)
+	bool On_Left(const point &A)
 	{
-		return (p - l.p) * l.v < eps;
+		return (A - p) * v < eps;
 	}
 	point Get_Intersection(const line &l)
 	{
