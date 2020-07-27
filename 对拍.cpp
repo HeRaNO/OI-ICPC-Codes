@@ -5,19 +5,19 @@ int main()
 {
 	system("g++ data.cpp -o data -O2");
 	system("g++ std.cpp -o std -O2");
-	system("g++ my.cpp -o test");
+	system("g++ my.cpp -o test -O2");
 	clock_t st, ed;
-	for (int i = 1; i <= 10; i++)
+	for (int i = 1; ; i++)
 	{
 		printf("%d\n", i);
 		//Sleep(1000);
-		system("data");
-		system("std");
+		system("data > in");
+		system("std < in > sout");
 		st = clock();
-		system("test");
+		system("test < in > tout");
 		ed = clock();
 		printf("Time used:%lfs\n", (double)(ed - st) / CLOCKS_PER_SEC);
-		int k = system("fc std.out test.out");
+		int k = system("fc sout tout");
 		if (k) break;
 		printf("AC\n");
 	}
