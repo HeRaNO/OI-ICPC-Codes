@@ -5,6 +5,8 @@ using namespace std;
 const double pi = acos(-1.0);
 const double eps = 1e-8;
 
+inline int sgn(double x){ return fabs(x) <= eps ? 0 : (x < 0 ? -1 : 1); }
+
 struct point
 {
 	double x, y;
@@ -20,9 +22,18 @@ struct point
 	point operator * (double r) const {
 		return point(x * r, y * r);
 	}
+	int quadrant() const {
+		int xs = sgn(x), ys = sgn(y);
+		return xs == 0 && ys == 0 ? -1 : ((ys < 0 || ys == 0 && xs > 0) ? 0 : 1);
+	}
+	double length() const {
+		return sqrt(x * x + y * y);
+	}
 	bool operator < (const point &p) const {
-		if (p.x != x) return p.x > x;
-		else return p.y > y;
+		int lq = quadrant(), rq = p.quadrant();
+		if (lq != rq) return lq < rq;
+		int s = sgn(*this * p);
+		return s ? s > 0 : sgn(length() - p.length()) < 0;
 	}
 	double operator ^ (const point &p) const {
 		return x * p.x + y * p.y;
@@ -37,12 +48,7 @@ struct point
 		double d = sqrt(x * x + y * y);
 		return point(x / d * r, y / d * r);
 	}
-	point Rotate(double alpha) const {
-		return point(x * cos(alpha) - y * sin(alpha), x * sin(alpha) + y * cos(alpha));
-	}
 };
-
-inline int sgn(double x){ return fabs(x) <= eps ? 0 : (x < 0 ? -1 : 1); }
 
 struct line
 {
@@ -52,13 +58,16 @@ struct line
 	bool OnLeft(const point &A) const {
 		return (A - p) * v < -eps;
 	}
+	bool OnRight(const point &A) const {
+		return (A - p) * v > eps;
+	}
 	point GetIntersection(const line &l) {
 		point u = p - l.p;
 		return p + v * ((l.v * u) / (v * l.v));
 	}
 	bool operator < (const line &l) const {
-		int res = sgn(v * l.v);
-		return !res ? l.OnLeft(p) : res < 0;
+		int r1 = sgn(v * l.v), r2 = sgn(v ^ l.v);
+		return !r1 && r2 > 0 ? l.OnLeft(p) : v < l.v;
 	}
 };
 
@@ -82,21 +91,24 @@ double distance(point a, point b)
 inline void halfplaneIntersection()
 {
 	sort(l, l + n);
-	int hq = 0, tq = 0, ha = 0, ta = 0;
-	q[tq++] = l[0];
+	int h = 0, t = 0;
+	q[t++] = l[0];
 	for (int i = 1; i < n; i++)
 	{
-		if (!sgn(l[i].v * l[i - 1].v)) continue;
-		while (ha < ta && !l[i].OnLeft(r[ta - 1])) --ta, --tq;
-		while (ha < ta && !l[i].OnLeft(r[ha])) ++ha, ++hq;
-		r[ta++] = l[i].GetIntersection(q[tq - 1]);
-		q[tq++] = l[i];
+		while (h + 1 < t && l[i].OnRight(r[t - 2])) --t;
+		while (h + 1 < t && l[i].OnRight(r[h])) ++h;
+		q[t++] = l[i];
+		if (!sgn(q[t - 2].v * q[t - 1].v))
+		{
+			t--;
+			if (q[t - 1].OnLeft(l[i].p)) q[t - 1] = l[i];
+		}
+		if (h + 1 < t) r[t - 2] = q[t - 2].GetIntersection(q[t - 1]);
 	}
-	while (ha < ta && !q[hq].OnLeft(r[ta - 1])) --ta, --tq;
-	while (ha < ta && !q[tq - 1].OnLeft(r[ha])) ++ha, ++hq;
-	r[ta++] = q[hq].GetIntersection(q[tq - 1]);
-	m = ta - ha;
-	for (int i = 0; i < m; i++) r[i] = r[i + ha];
+	while (h + 1 < t && q[h].OnRight(r[t - 2])) --t;
+	r[t - 1] = q[h].GetIntersection(q[t - 1]);
+	m = t - h;
+	for (int i = 0; i < m; i++) r[i] = r[i + h];
 	return ;
 }
 
