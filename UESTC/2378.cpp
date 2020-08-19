@@ -15,7 +15,7 @@ struct SplayTree
 };
 
 SplayTree tree[MAXN];
-int n,T,root,top,o,l,r,x,p[MAXN];
+int n,T,root,top,o,l,r,x,p[MAXN],sta[MAXN];
 long long w[MAXN],all,v;
 
 inline void Push_Up(int x)
@@ -57,6 +57,9 @@ inline void Rotate(int x,int &k)
 inline void Splay(int x,int &k)
 {
 	int y,z;
+	sta[sta[0]=1]=x;
+	for (int i=tree[x].f;i;i=tree[i].f) sta[++sta[0]]=i;
+	while (sta[0]) Push_Down(sta[sta[0]--]);
 	while (x!=k)
 	{
 		y=tree[x].f;z=tree[y].f;
@@ -72,13 +75,13 @@ inline void Splay(int x,int &k)
 
 inline int find(int k)
 {
-	int x=root,lsiz=0;
+	int x=root;
 	while (x)
 	{
-		Push_Down(x);int t=lsiz+tree[LC(x)].siz;
-		if (k<=t) x=LC(x);
-		else if (k<=t+1) return x;
-		else lsiz=t+1,x=RC(x);
+		Push_Down(x);
+		if (k==tree[LC(x)].siz) return x;
+		if (k<=tree[LC(x)].siz) x=LC(x);
+		else k-=tree[LC(x)].siz+1,x=RC(x);
 	}
 	return -1;
 }
@@ -94,7 +97,7 @@ inline int BuildTree(int l,int r,int f)
 
 inline void add(int l,int r,long long v)
 {
-	int x=find(l),y=find(r+2);
+	int x=find(l-1),y=find(r+1);
 	Splay(x,root);Splay(y,RC(x));
 	tree[LC(y)].lazy+=v;tree[LC(y)].w+=v;
 	tree[LC(y)].sw+=tree[LC(y)].siz*v;
@@ -103,23 +106,36 @@ inline void add(int l,int r,long long v)
 
 inline void reverse(int l,int r)
 {
-	int x=find(l),y=find(r+2);
-	Splay(x,root);Splay(y,RC(x));tree[LC(y)].rev^=1;
+	if (l>=r) return ;
+	int x=find(l-1),y=find(r+1);
+	Splay(x,root);Splay(y,RC(x));int rt=LC(y);
+	sta[sta[0]=1]=rt;
+	for (int i=tree[rt].f;i;i=tree[i].f) sta[++sta[0]]=i;
+	while (sta[0]) Push_Down(sta[sta[0]--]);
+	tree[rt].rev^=1;
 	return ;
+}
+
+inline int getPos(int x,int rt)
+{
+	int pos=tree[LC(x)].siz+1;
+	for (;x!=rt;x=tree[x].f)
+		if (RC(tree[x].f)==x) pos+=tree[LC(tree[x].f)].siz+1;
+	return pos;
 }
 
 inline int query(long long all)
 {
-	int l=1,r=n;
-	while (l!=r)
+	int x=find(0),y=find(n+1);
+	Splay(x,root);Splay(y,RC(x));int rt=LC(y);int r=rt;
+	while (true)
 	{
-		int mid=l+r>>1;
-		int x=find(l),y=find(mid+2);
-		Splay(x,root);Splay(y,RC(x));
-		if (tree[LC(y)].sw>=all) r=mid;
-		else {all-=tree[LC(y)].sw;l=mid+1;}
+		Push_Down(r);
+		if (tree[LC(r)].sw>=all) r=LC(r);
+		else if (tree[LC(r)].sw+tree[r].w>=all) return getPos(r,rt);
+		else all-=tree[LC(r)].sw+tree[r].w,r=RC(r);
 	}
-	return l;
+	return -1;
 }
 
 inline void read(int &x)
@@ -138,10 +154,10 @@ inline void read(int &x)
 
 int main()
 {
-	read(n);read(T);w[1]=w[n+2]=0;
-	for (int i=1;i<=n;i++) read(x),w[i+1]=x,all+=w[i+1],w[i+1]<<=1;
+	read(n);read(T);
+	for (int i=1;i<=n;i++) read(x),w[i]=x,all+=w[i],w[i]<<=1;
 	for (int i=1;i<=n;i++) read(p[i]);
-	root=BuildTree(1,n+2,0);
+	root=BuildTree(0,n+1,0);
 	printf("%d\n",p[query(all)]);
 	while (T--)
 	{
