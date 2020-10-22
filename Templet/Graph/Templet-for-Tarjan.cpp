@@ -46,11 +46,11 @@ namespace Tarjan_SCC
 	}
 }
 
-namespace Tarjan_EBCC
+namespace Tarjan_EBCC // Must 1-based
 {
 	vector <pair<int,int> > g[MAXN];
 	int n,m,T,u,v,w,bcc,top;
-	int dfn[MAXN],low[MAXN],vbel[MAXN],ebel[MAXM],sta[MAXN];
+	int dfn[MAXN],low[MAXN],vbel[MAXN],ebel[MAXM],sta[MAXN+MAXM];
 	bool vis[MAXM];
 
 	inline void add(int u,int v,int i) // Two way

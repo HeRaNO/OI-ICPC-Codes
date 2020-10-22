@@ -126,7 +126,7 @@ double Rotating_Calipers() //Get the longest distance among points
 	for (int i = 0; i < siz; i++)
 	{
 		while ((ch[i + 1] - ch[i]) * (ch[q + 1] - ch[i]) > (ch[i + 1] - ch[i]) * (ch[q] - ch[i])) q = (q + 1) % siz;
-		res = mymax(res, max(dis(ch[i], ch[q]), dis(ch[i + 1], ch[q + 1])));
+		res = max(res, max(dis(ch[i], ch[q]), dis(ch[i + 1], ch[q + 1])));
 	}
 	return res;
 }

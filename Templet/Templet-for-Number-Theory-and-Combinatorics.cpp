@@ -147,8 +147,8 @@ long long exBSGS(long long a, long long b, long long M)
 		if (w == b) return c;
 	}
 	b = b * inv(w, M) % M; mp.clear();
-	long long t = 1LL, r = b, x, y, B=ceil(sqrt(M));
-	for (long long i = 0; i < B; i++, t = t * a%M) if (!mp.count(t)) mp.insert({t, i});
+	long long t = 1LL, r = b, x, y, B = ceil(sqrt(M));
+	for (long long i = 0; i < B; i++, t = t * a % M) if (!mp.count(t)) mp.insert({t, i});
 	t = inv(t, M);
 	for (long long i = 0; i < B; i++, b = b * t % M) if (mp.count(b)) return i * B + mp[b] + c;
 	return -1LL;
