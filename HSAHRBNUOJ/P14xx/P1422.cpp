@@ -76,7 +76,7 @@ inline int Dinic(int x, int flow)
 
 inline void Dynamic_Programming()
 {
-	dp[1] = 1;
+	dp[1] = k = 1;
 	for (int i = 2; i <= n; i++)
 	{
 		for (int j = 1; j < i; j++) if (a[j] <= a[i]) dp[i] = mymax(dp[i], dp[j]);
