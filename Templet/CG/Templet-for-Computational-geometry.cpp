@@ -1,5 +1,7 @@
 #include <cmath>
+#include <deque>
 #include <cstdio>
+#include <vector>
 #include <algorithm>
 #define MAXN 1010
 using namespace std;
@@ -8,6 +10,12 @@ using namespace std;
 //Also,the eps can be changed if the problem needs.
 
 const double eps = 1e-7;
+
+inline int sgn(double x)
+{
+	if (fabs(x) <= eps) return 0;
+	return x < 0 ? -1 : 1;
+}
 
 struct point
 {
@@ -33,7 +41,7 @@ struct point
 	}
 	int quadrant() const {
 		int xs = sgn(x), ys = sgn(y);
-		return xs == 0 && ys == 0 ? -1 : ((ys < 0 || ys == 0 && xs > 0) ? 0 : 1);
+		return xs == 0 && ys == 0 ? -1 : ((ys < 0 || (ys == 0 && xs > 0)) ? 0 : 1);
 	}
 	double length() const {
 		return sqrt(x * x + y * y);
@@ -53,18 +61,21 @@ struct point
 	point norm() const {
 		return point(-y, x);
 	}
-	point unit(double r) const {
-		double d = sqrt(x * x + y * y);
+	point unit(double r = 1) const {
+		double d = length();
 		return point(x / d * r, y / d * r);
+	}
+	bool isZero() const {
+		return !sgn(x) && !sgn(y);
 	}
 };
 
-bool cmp(const point &a, const point &b)
+bool cmp(const point &a, const point &p)
 {
-	int lq = quadrant(), rq = p.quadrant();
+	int lq = a.quadrant(), rq = p.quadrant();
 	if (lq != rq) return lq < rq;
-	int s = sgn(*this * p);
-	return s ? s > 0 : sgn(length() - p.length()) < 0;
+	int s = sgn(a * p);
+	return s ? s > 0 : sgn(a.length() - p.length()) < 0;
 }
 
 struct line
@@ -73,10 +84,13 @@ struct line
 	line() {}
 	line(const point &_p, const point &_v): p(_p), v(_v) {}
 	bool OnLeft(const point &A) const {
-		return (A - p) * v < -eps;
+		return sgn((A - p) * v) < 0;
 	}
 	bool OnRight(const point &A) const {
-		return (A - p) * v > eps;
+		return sgn((A - p) * v) > 0;
+	}
+	bool On(const point &A) const {
+		return sgn((A - p) * v) == 0;
 	}
 	point GetIntersection(const line &l) {
 		point u = p - l.p;
@@ -115,18 +129,19 @@ double Polygon_Area(point *p, int n) //Figure out the size of the Polygon
 {
 	double S = 0.0;
 	int siz = ConvexHull(p, n);
-	for (int i = 0; i < siz; i++) S += p[i % siz] * p[(i + 1) % siz];
-	return S / 2.0;
+	for (int i = 0; i < siz; i++) S += ch[i] * ch[(i + 1) % siz];
+	return fabs(S / 2.0);
 }
 
-double Rotating_Calipers() //Get the longest distance among points
+double Rotating_Calipers(point p[]) //Get the longest distance among points
 {
 	double res = 0.0;
 	int q = 1;
-	for (int i = 0; i < siz; i++)
+	int n = ConvexHull(p, n);
+	for (int i = 0; i < n; i++)
 	{
-		while ((ch[i + 1] - ch[i]) * (ch[q + 1] - ch[i]) > (ch[i + 1] - ch[i]) * (ch[q] - ch[i])) q = (q + 1) % siz;
-		res = max(res, max(dis(ch[i], ch[q]), dis(ch[i + 1], ch[q + 1])));
+		while ((ch[i + 1] - ch[i]) * (ch[q + 1] - ch[i]) > (ch[i + 1] - ch[i]) * (ch[q] - ch[i])) q = (q + 1) % n;
+		res = max(res, max((ch[i] - ch[q]).length(), (ch[i + 1] - ch[q + 1]).length()));
 	}
 	return res;
 }
@@ -151,22 +166,22 @@ inline bool isIntersection(point a, point b, point c, point d)
 int in(int x, int y, int c)
 {
 	double k = sqrt(2), b = y - k * x;
-	int cnt = 0; Point O = Point(x, y);
+	int cnt = 0; point O = point(x, y);
 	for (int i = 0; i < c; i++)
 		if (ch[i].x == x && ch[i].y == y) return 2;
 	for (int i = 0; i < c; i++)
 	{
-		Point oa = ch[i] - O;
-		Point ob = ch[(i + 1) % c] - O;
-		if (fabs(oa * ob) <= eps) return 2;
+		point oa = ch[i] - O;
+		point ob = ch[(i + 1) % c] - O;
+		if (!sgn(oa * ob)) return 2;
 	}
 	for (int i = 0; i < c; i++)
 	{
 		double A = ch[(i + 1) % c].y - ch[i].y;
 		double B = ch[i].x - ch[(i + 1) % c].x;
 		double C = ch[(i + 1) % c] * ch[i];
-		double lx = min(ch[i].x, ch[(i + 1)%c].x), rx = max(ch[i].x, ch[(i + 1) % c].x);
-		double ly = min(ch[i].y, ch[(i + 1)%c].y), ry = max(ch[i].y, ch[(i + 1) % c].y);
+		double lx = min(ch[i].x, ch[(i + 1) % c].x), rx = max(ch[i].x, ch[(i + 1) % c].x);
+		double ly = min(ch[i].y, ch[(i + 1) % c].y), ry = max(ch[i].y, ch[(i + 1) % c].y);
 		double nx = -(B * b + C) / (A + B * k);
 		double ny = k * nx + b;
 		if (ny > y) continue;
@@ -176,29 +191,57 @@ int in(int x, int y, int c)
 }
 
 point r[MAXN];
-line l[MAXN], q[MAXN];
 
-inline int halfplaneIntersection(int n)
+// Consider the left side region of l.v
+// There may be same point in ans
+// q is the intersection of halfplane
+// Should notice the ans only indicate the intersection point of the adjacent halfplanes.
+inline int halfplaneIntersection(vector<line> &l)
 {
-	sort(l, l + n);
-	int h = 0, t = 0;
-	q[t++] = l[0];
+	deque<line> q;
+	deque<point> ans;
+	int n = l.size();
+	sort(l.begin(), l.end());
+	q.push_back(l.front());
 	for (int i = 1; i < n; i++)
 	{
-		while (h + 1 < t && l[i].OnRight(r[t - 2])) --t;
-		while (h + 1 < t && l[i].OnRight(r[h])) ++h;
-		q[t++] = l[i];
-		if (!sgn(q[t - 2].v * q[t - 1].v))
+		if (!sgn(l[i].v * l[i - 1].v)) continue;
+		while (!ans.empty() && l[i].OnRight(ans.back()))
 		{
-			t--;
-			if (q[t - 1].OnLeft(l[i].p)) q[t - 1] = l[i];
+			ans.pop_back();
+			q.pop_back();
 		}
-		if (h + 1 < t) r[t - 2] = q[t - 2].GetIntersection(q[t - 1]);
+		while (!ans.empty() && l[i].OnRight(ans.front()))
+		{
+			ans.pop_front();
+			q.pop_front();
+		}
+		ans.push_back(l[i].GetIntersection(q.back()));
+		q.push_back(l[i]);
 	}
-	while (h + 1 < t && q[h].OnRight(r[t - 2])) --t;
-	r[t - 1] = q[h].GetIntersection(q[t - 1]);
-	int m = t - h;
-	for (int i = 0; i < m; i++) r[i] = r[i + h];
+	while (!ans.empty() && q.front().OnRight(ans.back()))
+	{
+		ans.pop_back();
+		q.pop_back();
+	}
+	while (!ans.empty() && q.back().OnRight(ans.front()))
+	{
+		ans.pop_front();
+		q.pop_front();
+	}
+	ans.push_back(q.back().GetIntersection(q.front()));
+	int m = ans.size();
+	for (int i = 0; i < m; i++)
+	{
+		r[i] = ans.front();
+		ans.pop_front();
+	}
+	/* delete the same point
+	int m = 0;
+	for (point las = ans.back(); !ans.empty(); ans.pop_front())
+		if (!(ans.front() - las).isZero())
+			r[m++] = ans.front(), las = ans.front();
+	*/
 	return m;
 }
 
