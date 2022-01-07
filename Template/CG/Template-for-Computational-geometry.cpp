@@ -163,7 +163,7 @@ inline bool isIntersection(point a, point b, point c, point d)
 }
 
 // Judge whether point A, B and C listed in a counterclockwise order
-// When ccw(A, B, C), A, B and C lie on a same line
+// When ccw(A, B, C) = 0, A, B and C lie on a same line
 bool ccw(point A, point B, point C)
 {
 	return sgn(A * B + B * C + C * A) > 0;
