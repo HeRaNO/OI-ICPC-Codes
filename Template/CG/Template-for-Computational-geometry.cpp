@@ -41,6 +41,7 @@ struct point
 	}
 	int quadrant() const {
 		int xs = sgn(x), ys = sgn(y);
+		// Change -1 to 1 when sort points by atan2(y, x)
 		return xs == 0 && ys == 0 ? -1 : ((ys < 0 || (ys == 0 && xs > 0)) ? 0 : 1);
 	}
 	double length() const {
@@ -70,6 +71,7 @@ struct point
 	}
 };
 
+// compare function used in sortint points by atan2(y, x)
 bool cmp(const point &a, const point &p)
 {
 	int lq = a.quadrant(), rq = p.quadrant();
@@ -158,6 +160,13 @@ inline bool isIntersection(point a, point b, point c, point d)
 	double r = (d - c) * (d - a);
 	double s = (d - c) * (d - b);
 	return (p * q <= eps) && (r * s <= eps);
+}
+
+// Judge whether point A, B and C listed in a counterclockwise order
+// When ccw(A, B, C), A, B and C lie on a same line
+bool ccw(point A, point B, point C)
+{
+	return sgn(A * B + B * C + C * A) > 0;
 }
 
 // PIP Problem: Ray casting algorithm
