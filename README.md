@@ -10,7 +10,7 @@ Some solutions to OI / ICPC problems. They're from:
 - [HDU](http://acm.hdu.edu.cn/)
 - HSAHRBNUOJ: My high school's OJ. Because of the issues of copyright, the website won't be given.
 - [LibreOJ](https://loj.ac/)
-- Lutece: The problems' issues are quite messy...
+- Lutece: The backup of website and problemset is lost. The codes in the folder belonging to the 2018 UESTC ICPC Training for Math and Geometry and Weekly Problem.
 - [NOI[OpenJudge]](http://noi.openjudge.cn/)
 - [POJ](http://poj.org/)
 - [SCU](http://acm.scu.edu.cn/soj/)
