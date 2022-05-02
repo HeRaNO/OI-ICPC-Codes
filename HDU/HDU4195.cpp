@@ -3,7 +3,7 @@
 using namespace std;
 
 const double pi = acos(-1.0);
-const double eps = 1e-2;
+const double eps = 1e-6;
 
 struct Point
 {
@@ -34,17 +34,19 @@ inline double Angle(Point A, Point B, Point C)
 
 int main()
 {
-	scanf("%lf%lf", &A.x, &A.y);
-	scanf("%lf%lf", &B.x, &B.y);
-	scanf("%lf%lf", &C.x, &C.y);
-	a = Angle(B, A, C);
-	b = Angle(A, B, C);
-	c = Angle(A, C, B);
-	for (int i = 3; i <= 100; i++)
-		if (ck(a * i) && ck(b * i) && ck(c * i))
-		{
-			printf("%d\n", i);
-			return 0;
-		}
+	while (scanf("%lf%lf", &A.x, &A.y)==2)
+	{
+		scanf("%lf%lf", &B.x, &B.y);
+		scanf("%lf%lf", &C.x, &C.y);
+		a = Angle(B, A, C);
+		b = Angle(A, B, C);
+		c = Angle(A, C, B);
+		for (int i = 3; i <= 1000; i++)
+			if (ck(a * i) && ck(b * i) && ck(c * i))
+			{
+				printf("%d\n", i);
+				break;
+			}
+	}
 	return 0;
 }

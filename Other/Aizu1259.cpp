@@ -33,7 +33,7 @@ const int dice[24][6] =
 };
 
 int a[MAXN][MAXN], method[6], color[26];
-int ans = ~(1 << 31), n, cnt;
+int ans, n, cnt;
 bool zero;
 string s;
 map <string, int> mp;
@@ -66,10 +66,9 @@ void dfs(int dep)
 	return ;
 }
 
-int main()
+void Solve()
 {
-	cin >> n;
-	if (n == 1) return puts("0"), 0;
+	ans = ~(1 << 31); zero = false; cnt = 0;
 	for (int i = 1; i <= n; i++)
 		for (int j = 1; j <= 6; j++)
 		{
@@ -79,5 +78,17 @@ int main()
 		}
 	dfs(1);
 	cout << ans << '\n';
+	mp.clear();
+	return ;
+}
+
+
+int main()
+{
+	while (cin >> n)
+	{
+		if (!n) break;
+		Solve();
+	}
 	return 0;
 }
