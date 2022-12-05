@@ -5,40 +5,29 @@ using namespace std;
 
 namespace Tarjan_SCC
 {
-	struct link
-	{
-		int to,val,nxt;
-	};
-
-	link e[MAXM];
-	int head[MAXN],cnt;
-	int n,m,T,u,v,w,scc,top;
+	vector<int> g[MAXN];
+	int n,m,T,scc,top;
 	int dfn[MAXN],low[MAXN],bel[MAXN],sta[MAXN];
 	bool vis[MAXN];
 
-	inline void add(int u,int v,int w) // One way
+	void Tarjan(int x)
 	{
-		e[cnt]=(link){v,w,head[u]};head[u]=cnt++;
-	}
-
-	inline void Tarjan(int x,int fa)
-	{
-		dfn[x]=low[x]=++T;sta[++top]=x;
-		for (int i=head[x];~i;i=e[i].nxt)
+		dfn[x]=low[x]=++T;sta[++top]=x;vis[x]=true;
+		for (int v:g[x])
 		{
-			if (vis[e[i].to]||e[i].to==fa) continue;
-			if (dfn[e[i].to]) low[x]=min(low[x],dfn[e[i].to]);
-			else
+			if (!dfn[v]) 
 			{
-				Tarjan(e[i].to,x);
-				low[x]=min(low[x],low[e[i].to]);
+				Tarjan(v);
+				low[x]=min(low[x],low[v]);
 			}
+			else if (vis[v])
+				low[x]=min(low[x],dfn[v]);
 		}
 		if (dfn[x]==low[x])
 		{
 			int t;scc++;
-			do{
-				vis[t=sta[top--]]=true;
+			do {
+				vis[t=sta[top--]]=false;
 				bel[t]=scc;
 			} while (t!=x);
 		}
