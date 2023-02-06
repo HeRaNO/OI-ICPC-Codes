@@ -1,11 +1,11 @@
 #include <cstdio>
 #include <algorithm>
-#define MAXN 200010
+#define MAXN 200005
 using namespace std;
 
 struct LCT
 {
-	int ch[MAXN][2], fa[MAXN];
+	int ch[MAXN][2], fa[MAXN], st[MAXN];
 	long long path_s[MAXN], sub_s[MAXN], w[MAXN], v[MAXN];
 	bool rev[MAXN];
 
@@ -38,26 +38,26 @@ struct LCT
 		return !(ch[fa[x]][0] == x || ch[fa[x]][1] == x);
 	}
 
-	bool isRightCh(int x)
+	int isRightCh(int x)
 	{
-		return ch[fa[x]][1] == x;
+		return (ch[fa[x]][1] == x) ? 1 : 0;
 	}
 
 	void rotate(int x)
 	{
-		int y = fa[x], z = fa[y];
-		int chx = (ch[y][1] == x), chy = (ch[z][1] == y);
-		if (!isRoot(y)) ch[z][chy] = x;
-		ch[y][chx] = ch[x][chx ^ 1]; fa[ch[x][chx ^ 1]] = y;
-		ch[x][chx ^ 1] = y; fa[y] = x; fa[x] = z;
+		int y = fa[x], z = fa[y], chx = isRightCh(x);
+		if (!isRoot(y)) ch[z][isRightCh(y)] = x; fa[x] = z;
+		ch[y][chx] = ch[x][chx ^ 1]; fa[ch[x][chx ^ 1]] = y; 
+		ch[x][chx ^ 1] = y; fa[y] = x;
 		pushUp(y); pushUp(x);
 		return ;
 	}
 
 	void update(int x)
 	{
-		if (!isRoot(x)) update(fa[x]);
-		pushDown(x);
+		int t; st[t = 1] = x;
+		for (; !isRoot(x); ) st[++t] = (x = fa[x]);
+		for (; t; t--) pushDown(st[t]);
 		return ;
 	}
 
@@ -93,18 +93,29 @@ struct LCT
 		return ;
 	}
 
-	void Link(int x, int y)
+	int FindRoot(int x)
 	{
-		makeRoot(x); access(y); splay(y);
-		fa[x] = y; v[y] += sub_s[x]; pushUp(y);
-		return ;
+		access(x); splay(x); pushDown(x);
+		while (ch[x][0]) pushDown(x = ch[x][0]);
+		splay(x); return x;
 	}
 
-	void Cut(int x, int y)
+	bool Link(int x, int y)
 	{
-		makeRoot(x); access(y); splay(y);
+		makeRoot(x);
+		// if (FindRoot(y) == x) return false;
+		access(y); splay(y);
+		fa[x] = y; v[y] += sub_s[x]; pushUp(y);
+		return true;
+	}
+
+	bool Cut(int x, int y)
+	{
+		makeRoot(x);
+		// if (FindRoot(y) != x || fa[y] != x || ch[y][0]) return false;
+		access(y); splay(y);
 		ch[y][0] = fa[x] = 0; pushUp(y);
-		return ;
+		return true;
 	}
 
 	void Modify(int x, int y)
