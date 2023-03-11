@@ -1,49 +1,48 @@
-#include <cmath>
 #include <cstdio>
+#include <vector>
 #include <algorithm>
-#define MAXN 200010
-using namespace std;
+#include <functional>
 
 struct Point
 {
-	double x,y;
-	double dis(const Point &a)const{
-		return sqrt((x-a.x)*(x-a.x)+(y-a.y)*(y-a.y));
+	int x, y;
+	long long Dis(const Point &p)
+	{
+		return 1LL * (x - p.x) * (x - p.x) + 1LL * (y - p.y) * (y - p.y);
 	}
 };
 
-int n;
-Point p[MAXN],t[MAXN];
-double ans=1e18;
-
-bool cmp(Point x,Point y){return x.x==y.x?x.y<y.y:x.x<y.x;}
-bool cmpy(Point x,Point y){return x.y<y.y;}
-inline void min(double &x,double y){if (x>y) x=y;return ;}
-
-void DC(int l,int r)
-{
-	if (l==r) return ;
-	if (l+1==r){min(ans,p[l].dis(p[r]));return ;}
-	int m=l+r>>1,cnt=0;
-	DC(l,m);DC(m+1,r);
-	for (int i=l;i<=r;i++)
-		if (fabs(p[m].x-p[i].x)<=ans) t[++cnt]=p[i];
-	sort(t+1,t+cnt+1,cmpy);
-	for (int i=1;i<=cnt;i++)
-		for (int j=i+1;j<=cnt;j++)
-		{
-			if (t[j].y-t[i].y>=ans) break;
-			min(ans,t[i].dis(t[j]));
-		}
-	return ;
-}
-
 int main()
 {
-	scanf("%d",&n);
-	for (int i=1;i<=n;i++) scanf("%lf %lf",&p[i].x,&p[i].y);
-	sort(p+1,p+n+1,cmp);
-	DC(1,n);
-	printf("%.4lf\n",ans);
+	int n; scanf("%d", &n);
+	std::vector<Point> p(n);
+	for (int i = 0; i < n; i++)
+		scanf("%d %d", &p[i].x, &p[i].y);
+	std::sort(p.begin(), p.end(), [&](Point x, Point y){
+		return x.x < y.x;
+	});
+	std::function<long long(int, int)> DC = [&](int l, int r)
+	{
+		if (l + 1 == r) return ~(1LL << 63);
+		int m = l + r >> 1;
+		int X = p[m].x;
+		long long d = std::min(DC(l, m), DC(m, r));
+		std::inplace_merge(p.begin() + l, p.begin() + m, p.begin() + r, [&](Point x, Point y){
+			return x.y < y.y;
+		});
+		std::vector<Point> t;
+		for (int i = l; i < r; i++)
+			if (1LL * (p[i].x - X) * (p[i].x - X) < d)
+				t.push_back(p[i]);
+		for (int i = 0; i < t.size(); i++)
+			for (int j = i + 1; j < t.size(); j++)
+			{
+				if (1LL * (t[j].y - t[i].y) * (t[j].y - t[i].y) >= d)
+					break;
+				d = std::min(d, t[j].Dis(t[i]));
+			}
+		return d;
+	};
+	printf("%lld\n", DC(0, n));
 	return 0;
 }
