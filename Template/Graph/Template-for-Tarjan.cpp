@@ -35,39 +35,42 @@ namespace Tarjan_SCC
 	}
 }
 
-namespace Tarjan_EBCC // Must 1-based
+namespace Tarjan_EBCC
 {
-	vector <pair<int,int> > g[MAXN];
-	int n,m,T,u,v,w,bcc,top;
-	int dfn[MAXN],low[MAXN],vbel[MAXN],ebel[MAXM],sta[MAXN+MAXM];
-	bool vis[MAXM];
+	vector<pair<int, int>> g[MAXN];
+	int T, bcc;
+	int dfn[MAXN], low[MAXN];
+	bool is_brige[MAXM];
+	vector<vector<int>> ans;
+	stack<int> stk;
 
-	inline void add(int u,int v,int i) // Two way
+	void add(int u,int v,int i) // Two way
 	{
 		g[u].push_back({v,i});
 		g[v].push_back({u,i});
 	}
 
-	inline void Tarjan(int x,int fa)
+	void Tarjan(int x,int fa)
 	{
-		dfn[x]=low[x]=++T;sta[++top]=x;
-		for (auto i:g[x])
+		dfn[x] = low[x] = ++T; stk.push(x);
+		for (auto [v, pt] : g[x])
 		{
-			int v=i.first,pt=i.second;
-			if (vis[pt]) continue;
-			vis[pt]=true;sta[++top]=-pt;
-			if (dfn[v]) low[x]=min(low[x],dfn[v]);
-			else
+			if (!dfn[v])
 			{
-				Tarjan(v,pt);
-				low[x]=min(low[x],low[v]);
+				tarjan(v, pt);
+				low[x] = std::min(low[x], low[v]);
 			}
+			else if (pt != f)
+				low[x] = std::min(low[x], dfn[v]);
 		}
-		if (dfn[x]==low[x])
+		if (dfn[x] == low[x])
 		{
-			for (++bcc;sta[top]!=-fa;--top)
-				sta[top]>0?vbel[sta[top]]=bcc:ebel[-sta[top]]=bcc;
-			if (top) --top;
+			if (f != -1) is_brige[f] = true;
+			++bcc; std::vector<int> vec;
+			for (; stk.top() != x; stk.pop())
+				vec.push_back(stk.top());
+			vec.push_back(x); stk.pop();
+			ans.emplace_back(vec);
 		}
 		return ;
 	}
