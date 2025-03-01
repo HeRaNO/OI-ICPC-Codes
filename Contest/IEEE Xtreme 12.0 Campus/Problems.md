@@ -16,7 +16,7 @@ Code：HeRaNO
 
 求字符串的回文子串数模 $10^8+7$。
 
-回文自动机或者 Manacher 板子题……
+回文自动机或者 Manacher 板子题。
 
 Code：Decision
 
@@ -27,6 +27,8 @@ $1\le n\le 2\times 10^6$
 一棵树，点的颜色为 $0$ 或 $1$。若树上一条路径经过 $0$ 点和 $1$ 点个数相等，就称这条路径是幸运的。点集的幸运值是集合内任意两城市形成的幸运路径条数。给出一个点的排列，取一连续段作为一个点集，剩下的构成另一个点集。希望第一个点集的幸运值大于第二个点集的。求有多少种连续段可以选择。
 
 $1\le n\le 10^5$
+
+[BZOJ 3320](https://vjudge.net/problem/BZOJ-3320)，原题根本没多少人过，而且网上没题解，合理怀疑出题人就嗯搬了数据。
 
 # D. Alice's boatherds
 
@@ -50,17 +52,21 @@ Code：HeRaNO
 $$
 (\sin x+\sin y+\sin z)\times[x+y+z=n]\times[x\ge 1]\times[y\ge 1]\times[z\ge 1]
 $$
-的最大值。
+的最大值。其中 $x,y,z$ 均为整数。
 
 $1\le n\le 5\times 10^6$
+
+[玲珑杯 Round 17. Sin your life](https://web.archive.org/web/20171104052222/https://www.ifrog.cc/acm/problem/1137)
 
 Code：HeRaNO
 
 # G. Alice's Card
 
-$n$ 张卡片排成一排，背面朝上。每秒可以选择一张卡片和另一张与其距离不超过 $k$ 的卡，把它们两个翻过来。选择第 $i$ 张卡的代价是 $C_i$，求让所有卡片都正面朝上的最小代价。
+$n$ 张卡片排成一排，背面朝上。每秒可以选择一张卡片和所有与其距离不超过 $k$ 的卡，把它们翻过来。选择第 $i$ 张卡的代价是 $C_i$，求让所有卡片都正面朝上的最小代价。
 
 $1\le n\le 10^4,1\le k\le 10^3,1\le C_i\le 10^9$
+
+[HackerRank - Turn Off the Lights](https://www.hackerrank.com/contests/101hack42/challenges/turn-off-the-lights)
 
 Code：HeRaNO
 
@@ -78,11 +84,15 @@ $$
 
 $1\le l\le 50,0\le n,m\le 2\times 10^3$
 
+[HackerRank - Array Construction](https://www.hackerrank.com/contests/university-codesprint/challenges/array-construction)
+
 # I. Alice's book
 
 给定 $m$ 个数，问 $[1,n]$ 中有多少数是奇数个给定数的倍数。
 
 $1\le n\le 10^9,1\le m\le 25$
+
+玲珑杯 Round 17. 震惊，99%+的中国人都会算错的问题
 
 Code：HeRaNO
 
@@ -94,6 +104,8 @@ Code：HeRaNO
 - 区间加。
 
 $1\le T\le 100,1\le n,q\le 10^5$
+
+线段树板子
 
 Code：yuanlinxiao
 
@@ -115,13 +127,15 @@ Code：HeRaNO
 
 $1\le n\le 10^5,0\le a_i\le 10^5,1\le k\le 10^9$
 
+[HDU 5171](https://acm.hdu.edu.cn/showproblem.php?pid=5171)
+
 Code：yuanlinxiao
 
 # M. Alice's candy
 
 名字都不改，是屑。
 
-[BZOJ 4548](https://www.lydsy.com/JudgeOnline/problem.php?id=4548) 完全一致。
+[BZOJ 4548](https://vjudge.net/problem/BZOJ-4548) 完全一致。
 
 Code：HeRaNO
 
@@ -131,7 +145,7 @@ Code：HeRaNO
 
 $0\le D_{i-1}\le D_i\le 10^5,1\le n\le 200,1\le k\le 10^5$
 
-目测是一个树上背包。
+[BZOJ 4711](https://vjudge.net/problem/BZOJ-4711) 完全一致。
 
 # O. Alice's distence tree
 
@@ -139,7 +153,7 @@ $0\le D_{i-1}\le D_i\le 10^5,1\le n\le 200,1\le k\le 10^5$
 
 $1\le n\le 5\times 10^4,1\le m\le 3\times 10^5$
 
-[BZOJ 3784](https://www.lydsy.com/JudgeOnline/problem.php?id=3784) 搬权限题，是屑，而且完全一致。
+[BZOJ 3784](https://vjudge.net/problem/BZOJ-3784) 搬权限题，是屑，而且完全一致。
 
 Code：Decision
 
@@ -149,4 +163,4 @@ Code：Decision
 
 $1\le n,q\le 10^5$
 
-原题来自 [LibreOJ #6145](https://loj.ac/problem/6145)，是屑。
+原题来自 [LibreOJ #6145](https://loj.ac/p/6145)，是屑。
