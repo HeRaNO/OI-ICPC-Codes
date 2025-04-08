@@ -44,16 +44,14 @@ inline void Analyze(int X,int Y,int V)
 
 int main()
 {
-	while (scanf("%d",&n)==1)
+	scanf("%d",&n);
+	for (int i=1;i<=n;i++)
 	{
-		for (int i=1;i<=n;i++)
-		{
-			scanf("%d %d %d",&l[i],&r[i],&y[i]);
-			if (l[i]>r[i]) swap(l[i],r[i]);
-			v[i]=r[i]-l[i];
-		}
-		for (int i=1;i<=n;i++) Analyze(l[i],y[i],v[i]),Analyze(r[i],y[i],v[i]);
-		printf("%lld\n",ans);ans=0;
+		scanf("%d %d %d",&l[i],&r[i],&y[i]);
+		if (l[i]>r[i]) swap(l[i],r[i]);
+		v[i]=r[i]-l[i];
 	}
+	for (int i=1;i<=n;i++) Analyze(l[i],y[i],v[i]),Analyze(r[i],y[i],v[i]);
+	printf("%lld\n",ans);
 	return 0;
 }

@@ -2,24 +2,24 @@
 
 Some solutions to OI / ICPC problems. They're from:
 
+- [Aizu](https://judge.u-aizu.ac.jp/onlinejudge/)
 - [AtCoder](https://atcoder.jp/)
-- [BZOJ](https://darkbzoj.tk/)
+- [BZOJ](https://hydro.ac/p?q=namespace%3Abzoj)
 - [CodeChef](https://www.codechef.com/)
 - [Codeforces](https://codeforces.com/)
 - [COGS](http://cogs.pro:8081/cogs/)
 - [HDU](http://acm.hdu.edu.cn/)
-- HSAHRBNUOJ: My high school's OJ. Because of the issues of copyright, the website won't be given.
+- HSAHRBNUOJ
 - [LibreOJ](https://loj.ac/)
 - [NOI[OpenJudge]](http://noi.openjudge.cn/)
 - [POJ](http://poj.org/)
-- [SCU](http://acm.scu.edu.cn/soj/)
+- SCU
 - [SPOJ](https://www.spoj.com/)
-- [UESTC](https://acm.uestc.edu.cn/home)
+- [UESTC](https://cdoj.site/)
 - [UOJ](https://uoj.ac/)
 - [URAL](https://acm.timus.ru/)
-- [UVALive](https://icpcarchive.ecs.baylor.edu/index.php)
+- [UVa](https://onlinejudge.org/)
 - [Vijos](https://vijos.org/)
-- [ZJU](http://acm.zju.edu.cn/onlinejudge/)
+- [ZJU](https://pintia.cn/problem-sets/91827364500)
 
-In `/Other`, there are codes from somewhere else. All the codes have been formatted. Good luck and have fun lol~
-
+In `/Other`, there are codes from somewhere else. Good luck and have fun lol~
