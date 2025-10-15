@@ -259,7 +259,7 @@ inline void Get_Factor_and_Inv(int n, long long MOD)
 {
 	inv[1] = fac[0] = invfac[0] = 1LL;
 	for (int i = 2; i <= n; i++) inv[i] = (MOD - MOD / i) * inv[MOD % i] % MOD;
-	for (int i = 2; i <= n; i++) fac[i] = (fac[i - 1] * i) % MOD, invfac[i] = (invfac[i - 1] * inv[i]) % MOD;
+	for (int i = 1; i <= n; i++) fac[i] = (fac[i - 1] * i) % MOD, invfac[i] = (invfac[i - 1] * inv[i]) % MOD;
 	return ;
 }
 
